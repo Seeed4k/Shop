@@ -1,6 +1,6 @@
 ---
 name: 'Produkt 1 '
-kategorie: brot
+kategorie: kategorie-a
 preisCent: 2000
 einheit: '1kg '
 grundpreis: 18,26 € / kg
