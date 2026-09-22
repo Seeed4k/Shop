@@ -1,23 +1,21 @@
 {
   "shop": {
-    "name": "Hofladen Sonnenacker",
+    "name": "AllStore ",
     "website": "https://shoppi1.netlify.app",
-    "logo": "/src/bilder/shop/logo.png",
-    "favicon": "/src/bilder/shop/favicon.png",
+    "logo": "/src/bilder/shop/shop/logo.png",
+    "favicon": "/src/bilder/shop/shop/favicon.png",
     "primaerfarbe": "#d4007a",
     "akzentfarbe": "#ffd60a",
     "schrift": "freundlich",
     "hintergrund": "bild",
-    "hintergrundBild": "/src/bilder/shop/hintergrundBild.jpg",
-    "startseiteUeberschrift": "Frisch vom Hof, direkt zu Ihnen",
-    "startseiteText": "Wir backen jeden Morgen, machen unseren Käse selbst und füllen ein, was der Garten hergibt. Suchen Sie sich zusammen, was Sie mögen, und schicken Sie uns Ihre Anfrage per Messenger.",
-    "startseiteBild": "/src/bilder/shop/startseiteBild.jpg",
-    "startseiteBildAlt": "Blick über die Felder des Hofes am Morgen"
+    "hintergrundBild": "/src/bilder/shop/shop/hintergrundBild.jpg",
+    "startseiteUeberschrift": "Dort Jahren bekannt ",
+    "startseiteText": "Seit Jahren bekannt und bewährt ",
+    "startseiteBild": "/src/bilder/shop/shop/startseiteBild.jpeg",
+    "startseiteBildAlt": "Bunt "
   },
   "kontakt": {
-    "inhaber": "Anna und Martin Feldmann GbR",
-    "adresse": "Sonnenackerweg 12\n01234 Musterdorf",
-    "email": "hallo@hofladen-sonnenacker.example",
+    "email": "Hello@gnx.net ",
     "telefon": "01234 567890"
   },
   "messenger": {
@@ -37,6 +35,6 @@
   "preise": {
     "umsatzsteuerModus": "kleinunternehmer"
   },
-  "versand": "Abholung am Hof ist jederzeit nach Absprache möglich und kostenlos.\nVersand innerhalb Deutschlands: 5,90 € pauschal, ab 50 € Bestellwert versandkostenfrei.\nWir versenden dienstags und donnerstags. Frische Ware geht nur dienstags raus.",
+  "versand": "Versand innerhalb Deutschlands: 5,90 € pauschal, ab 50 € Bestellwert versandkostenfrei",
   "bestellablauf": "Sie schicken uns Ihre Anfrage über einen der Messenger. Wir melden uns in der Regel innerhalb eines Werktags mit einer Bestätigung und dem Gesamtbetrag inklusive Versand. Erst damit ist Ihre Bestellung verbindlich. Bezahlt wird per Überweisung oder bar bei der Abholung."
 }
