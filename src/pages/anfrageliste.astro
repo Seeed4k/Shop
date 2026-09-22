@@ -1,28 +1,146 @@
 ---
 import Grundlayout from '../layouts/Grundlayout.astro';
-import { einstellungen } from '../lib/einstellungen';
+import { einstellungen, messengerAktiv } from '../lib/einstellungen';
+import { produkteLaden, produktLink } from '../lib/inhalte';
+import { chatLinks } from '../scripts/nachricht';
+import { qrAlsSvg } from '../lib/qr';
+import { zwischensummeHinweis } from '../lib/preis';
+import { alsJson } from '../lib/einbetten';
 import { texte } from '../lib/texte';
 
 /**
- * Anfrageliste – Gerüst aus Phase 2.
+ * Die Anfrageliste.
  *
- * Die Seite bringt schon alle Texte mit, die aus den Einstellungen kommen:
- * Bestellablauf und Versandangaben. Das Sammeln der Artikel, der
- * Nachrichtentext und die Messenger-Buttons folgen in Phase 3.
+ * Sie lebt vollständig im Browser: Die Artikel liegen im localStorage, der
+ * Bestelltext entsteht erst beim Klick, und die Messenger-Links sind
+ * gewöhnliche Links. Kein Server, keine Cookies, kein fremdes Skript.
+ *
+ * Die aktuellen Produktdaten werden unten als JSON in die Seite gelegt. So
+ * kann die Liste beim Öffnen Preise und Verfügbarkeit abgleichen, ohne dafür
+ * etwas nachzuladen.
  */
-const { versand, bestellablauf } = einstellungen;
+const { versand, bestellablauf, shop, messenger } = einstellungen;
+const produkte = await produkteLaden();
+
+const produktDaten = produkte.map((produkt) => ({
+  slug: produkt.slug,
+  name: produkt.name,
+  preisCent: produkt.preisCent,
+  einheit: produkt.einheit,
+  verfuegbar: produkt.verfuegbar,
+  link: produktLink(produkt),
+}));
+
+const shopDaten = {
+  name: shop.name,
+  zwischensummeHinweis: zwischensummeHinweis(einstellungen),
+  messenger,
+};
+
+/*
+ * Die QR-Codes entstehen beim Build, nicht im Browser.
+ *
+ * Sie zeigen auf den reinen Chat-Link ohne Bestelltext. Der hängt nur an den
+ * Einstellungen und ändert sich nie – anders als der Bestelltext, der sich mit
+ * jeder Mengenänderung ändern würde. So bleibt der Code klein genug, um ihn
+ * zuverlässig vom Bildschirm abzuscannen.
+ */
+const dienstnamen = { telegram: 'Telegram', threema: 'Threema', signal: 'Signal' } as const;
+
+const qrCodes = chatLinks(shopDaten).map((link) => ({
+  name: dienstnamen[link.dienst],
+  svg: qrAlsSvg(link.href, texte.messenger.qrBeschriftung(dienstnamen[link.dienst], shop.name)),
+}));
 ---
 
 <Grundlayout titel={texte.anfrageliste.ueberschrift}>
   <div class="huelle seite">
     <h1>{texte.anfrageliste.ueberschrift}</h1>
 
-    <div class="liste" data-anfrageliste>
-      <p class="leer">{texte.anfrageliste.leer}</p>
-      <p><a href="/">{texte.anfrageliste.weiterStoebern}</a></p>
-    </div>
+    <noscript>
+      <p class="kasten kasten--hinweis">
+        Für die Anfrageliste wird JavaScript benötigt. Sie erreichen uns auch direkt
+        über die Kontaktdaten im Fußbereich.
+      </p>
+    </noscript>
 
-    <p class="baustelle">{texte.anfrageliste.inArbeit}</p>
+    <div data-wurzel hidden>
+      {/* Meldungen über geänderte Preise und entfallene Artikel. */}
+      <div class="meldungen" data-meldungen role="status"></div>
+
+      <p class="leer" data-leer hidden>
+        {texte.anfrageliste.leer} <a href="/">{texte.anfrageliste.weiterStoebern}</a>
+      </p>
+
+      <div data-inhalt hidden>
+        <ul class="posten" data-posten></ul>
+
+        <div class="summe">
+          <span class="summe__wort">{texte.anfrageliste.summeZeile}</span>
+          <span class="summe__betrag" data-summe></span>
+          <span class="summe__zusatz">{zwischensummeHinweis(einstellungen)}</span>
+        </div>
+
+        <p class="werkzeuge">
+          <button type="button" class="knopf knopf--leise" data-leeren>
+            {texte.anfrageliste.listeLeeren}
+          </button>
+        </p>
+
+        <div class="felder">
+          <p class="felder__label">
+            <label for="besteller-name">{texte.anfrageliste.name}</label>
+            <input id="besteller-name" type="text" autocomplete="name" maxlength="80" data-name />
+          </p>
+          <p class="felder__label">
+            <label for="besteller-anmerkung">{texte.anfrageliste.anmerkung}</label>
+            <textarea id="besteller-anmerkung" rows="3" maxlength="500" data-anmerkung></textarea>
+          </p>
+          <p class="felder__hinweis">{texte.anfrageliste.datenschutzHinweis}</p>
+        </div>
+
+        <section class="senden">
+          <h2>{texte.messenger.ueberschrift}</h2>
+
+          {messengerAktiv ? (
+            <ul class="senden__knoepfe" data-messenger></ul>
+          ) : (
+            <p class="kasten kasten--hinweis">{texte.messenger.keinerAktiv}</p>
+          )}
+
+          <p class="senden__zusatz">
+            <button type="button" class="knopf knopf--leise" data-kopieren>
+              {texte.messenger.kopieren}
+            </button>
+          </p>
+
+          <p class="rueckmeldung" data-kopier-rueckmeldung role="status" hidden></p>
+
+          <details class="vorschau">
+            <summary>{texte.messenger.vorschau}</summary>
+            <textarea class="vorschau__feld" readonly rows="8" data-vorschau></textarea>
+          </details>
+
+          {qrCodes.length > 0 && (
+            <details class="vorschau qr">
+              <summary>{texte.messenger.qrUeberschrift}</summary>
+              <p class="qr__text">{texte.messenger.qrErklaerung}</p>
+              <ul class="qr__liste">
+                {qrCodes.map((code) => (
+                  <li class="qr__eintrag">
+                    <div class="qr__bild" set:html={code.svg} />
+                    <span class="qr__name">{code.name}</span>
+                  </li>
+                ))}
+              </ul>
+              <p class="qr__text qr__text--leise">{texte.messenger.qrNachtrag}</p>
+            </details>
+          )}
+
+          <p class="hinweis">{texte.anfrageliste.keinVertrag}</p>
+        </section>
+      </div>
+    </div>
 
     {bestellablauf && (
       <section class="kasten">
@@ -37,10 +155,10 @@ const { versand, bestellablauf } = einstellungen;
         {versand.split('\n').map((zeile: string) => <p>{zeile}</p>)}
       </section>
     )}
-
-    <p class="hinweis">{texte.anfrageliste.keinVertrag}</p>
-    <p class="hinweis">{texte.anfrageliste.datenschutzHinweis}</p>
   </div>
+
+  <script type="application/json" id="shop-daten" set:html={alsJson(shopDaten)} is:inline></script>
+  <script type="application/json" id="produkt-daten" set:html={alsJson(produktDaten)} is:inline></script>
 </Grundlayout>
 
 <style>
@@ -49,17 +167,305 @@ const { versand, bestellablauf } = einstellungen;
     padding-block: 2rem 1rem;
   }
 
+  .meldungen:empty {
+    display: none;
+  }
+
+  .meldungen p {
+    margin: 0 0 0.6rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--farbe-akzent-hell);
+    border-left: 4px solid var(--farbe-akzent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.92rem;
+  }
+
   .leer {
     color: var(--farbe-text-leise);
   }
 
-  .baustelle {
-    padding: 0.85rem 1rem;
-    border: 1px dashed var(--farbe-linie);
+  /* --- Posten ----------------------------------------------------------- */
+
+  .posten {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--farbe-linie);
+  }
+
+  .posten :global(li) {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.2rem 1rem;
+    align-items: center;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--farbe-linie);
+  }
+
+  .posten :global(.posten__name) {
+    font-weight: 600;
+  }
+
+  .posten :global(.posten__name a) {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .posten :global(.posten__name a:hover) {
+    text-decoration: underline;
+  }
+
+  .posten :global(.posten__einzeln) {
+    grid-column: 1;
+    font-size: 0.88rem;
+    color: var(--farbe-text-leise);
+  }
+
+  .posten :global(.posten__steuerung) {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .posten :global(.posten__menge) {
+    width: 4.2rem;
+    padding: 0.45rem 0.5rem;
+    font: inherit;
+    text-align: center;
+    border: 1px solid var(--farbe-linie);
+    border-radius: var(--radius);
+    background: var(--farbe-flaeche);
+    color: inherit;
+  }
+
+  .posten :global(.posten__gesamt) {
+    min-width: 5.5rem;
+    text-align: right;
+    font-weight: 650;
+  }
+
+  .posten :global(.posten__weg) {
+    padding: 0.35rem;
+    line-height: 0;
+    background: none;
+    border: 1px solid transparent;
     border-radius: var(--radius);
     color: var(--farbe-text-leise);
+    cursor: pointer;
+  }
+
+  .posten :global(.posten__weg:hover) {
+    color: var(--farbe-warnung);
+    border-color: var(--farbe-linie);
+  }
+
+  /* --- Summe und Formular ----------------------------------------------- */
+
+  .summe {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0 1rem;
+    padding: 1rem 0;
+  }
+
+  .summe__wort {
+    font-weight: 650;
+  }
+
+  .summe__betrag {
+    font-weight: 650;
+    font-size: 1.25rem;
+    text-align: right;
+    color: var(--farbe-primaer-dunkel);
+  }
+
+  .summe__zusatz {
+    grid-column: 1 / -1;
+    font-size: 0.85rem;
+    color: var(--farbe-text-leise);
+  }
+
+  .werkzeuge {
+    margin: 0 0 1.75rem;
+  }
+
+  .felder {
+    padding: 1.1rem 1.25rem;
+    background: var(--farbe-flaeche-leise);
+    border-radius: var(--radius);
+  }
+
+  .felder__label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .felder__label label {
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  .felder input,
+  .felder textarea {
+    width: 100%;
+    padding: 0.6rem 0.7rem;
+    font: inherit;
+    border: 1px solid var(--farbe-linie);
+    border-radius: var(--radius);
+    background: var(--farbe-flaeche);
+    color: inherit;
+    resize: vertical;
+  }
+
+  .felder__hinweis {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--farbe-text-leise);
+  }
+
+  /* --- Senden ----------------------------------------------------------- */
+
+  .senden {
+    margin-top: 2rem;
+  }
+
+  .senden h2 {
+    font-size: 1.25rem;
+  }
+
+  .senden__knoepfe {
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .senden__knoepfe :global(a) {
+    display: block;
+    padding: 0.8rem 1.2rem;
+    text-align: center;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--farbe-auf-primaer);
+    background: var(--farbe-primaer);
+    border: 1px solid var(--farbe-primaer);
+    border-radius: var(--radius);
+  }
+
+  .senden__knoepfe :global(a:hover) {
+    background: var(--farbe-primaer-dunkel);
+    border-color: var(--farbe-primaer-dunkel);
+  }
+
+  .senden__knoepfe :global(.senden__fussnote) {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--farbe-text-leise);
+  }
+
+  .knopf {
+    padding: 0.7rem 1.2rem;
+    font: inherit;
+    font-weight: 600;
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: var(--farbe-auf-primaer);
+    background: var(--farbe-primaer);
+    border: 1px solid var(--farbe-primaer);
+  }
+
+  .knopf--leise {
+    color: var(--farbe-primaer-dunkel);
+    background: var(--farbe-flaeche);
+    border-color: var(--farbe-linie);
+  }
+
+  .knopf--leise:hover {
+    border-color: var(--farbe-primaer);
+  }
+
+  .rueckmeldung {
+    margin: 0 0 1rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--farbe-akzent-hell);
+    border-left: 4px solid var(--farbe-akzent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-weight: 600;
+    font-size: 0.93rem;
+  }
+
+  .vorschau {
+    margin-top: 0.5rem;
+  }
+
+  .vorschau summary {
+    cursor: pointer;
+    font-size: 0.92rem;
+    color: var(--farbe-text-leise);
+  }
+
+  .vorschau__feld {
+    width: 100%;
+    margin-top: 0.6rem;
+    padding: 0.7rem;
+    font: inherit;
+    font-size: 0.9rem;
+    border: 1px solid var(--farbe-linie);
+    border-radius: var(--radius);
+    background: var(--farbe-flaeche-leise);
+    color: inherit;
+  }
+
+  /* --- QR-Codes --------------------------------------------------------- */
+
+  .qr__text {
+    margin: 0.7rem 0;
     font-size: 0.92rem;
   }
+
+  .qr__text--leise {
+    color: var(--farbe-text-leise);
+    font-size: 0.85rem;
+  }
+
+  .qr__liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+
+  .qr__eintrag {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .qr__bild :global(svg) {
+    display: block;
+    /* Rund 4 mm je Modul auf einem üblichen Bildschirm – darunter wird das
+       Abscannen aus normalem Abstand unzuverlässig. */
+    width: 9.5rem;
+    height: 9.5rem;
+    border: 1px solid var(--farbe-linie);
+    border-radius: 0.4rem;
+  }
+
+  .qr__name {
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  /* --- Kästen ----------------------------------------------------------- */
 
   .kasten {
     margin-top: 1.75rem;
@@ -77,9 +483,297 @@ const { versand, bestellablauf } = einstellungen;
     margin-bottom: 0;
   }
 
+  .kasten--hinweis {
+    border-left: 4px solid var(--farbe-akzent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
   .hinweis {
     margin-top: 1.25rem;
     font-size: 0.9rem;
     color: var(--farbe-text-leise);
   }
 </style>
+
+<script>
+  import { lesen, schreiben, mengeSetzen, entfernen, leeren, beiAenderung, speicherVerfuegbar, type Posten } from '../scripts/liste';
+  import {
+    nachrichtBauen,
+    zwischensumme,
+    messengerKnoepfe,
+    preisFormatieren,
+    kopieren,
+    type ProduktDaten,
+    type ShopDaten,
+    type Zeile,
+  } from '../scripts/nachricht';
+  import { texte } from '../lib/texte';
+
+  function datenLesen<T>(id: string): T | undefined {
+    const element = document.getElementById(id);
+    if (!element?.textContent) return undefined;
+    try {
+      return JSON.parse(element.textContent) as T;
+    } catch {
+      return undefined;
+    }
+  }
+
+  const shop = datenLesen<ShopDaten>('shop-daten');
+  const produktliste = datenLesen<ProduktDaten[]>('produkt-daten') ?? [];
+  const produkte = new Map(produktliste.map((produkt) => [produkt.slug, produkt]));
+
+  const wurzel = document.querySelector<HTMLElement>('[data-wurzel]');
+  const meldungen = document.querySelector<HTMLElement>('[data-meldungen]');
+  const leerHinweis = document.querySelector<HTMLElement>('[data-leer]');
+  const inhalt = document.querySelector<HTMLElement>('[data-inhalt]');
+  const postenListe = document.querySelector<HTMLUListElement>('[data-posten]');
+  const summenfeld = document.querySelector<HTMLElement>('[data-summe]');
+  const namensfeld = document.querySelector<HTMLInputElement>('[data-name]');
+  const anmerkungsfeld = document.querySelector<HTMLTextAreaElement>('[data-anmerkung]');
+  const messengerListe = document.querySelector<HTMLUListElement>('[data-messenger]');
+  const kopierKnopf = document.querySelector<HTMLButtonElement>('[data-kopieren]');
+  const rueckmeldung = document.querySelector<HTMLElement>('[data-kopier-rueckmeldung]');
+  const vorschaufeld = document.querySelector<HTMLTextAreaElement>('[data-vorschau]');
+  const leerenKnopf = document.querySelector<HTMLButtonElement>('[data-leeren]');
+
+  // Erst jetzt sichtbar: Ohne Skript wäre hier nur ein leeres Gerüst.
+  if (wurzel) wurzel.hidden = false;
+
+  function meldungAnzeigen(text: string) {
+    if (!meldungen) return;
+    const absatz = document.createElement('p');
+    absatz.textContent = text;
+    meldungen.appendChild(absatz);
+  }
+
+  /**
+   * Gleicht die gespeicherte Liste mit den aktuellen Produktdaten ab.
+   *
+   * Zwischen dem Ablegen eines Artikels und dem Öffnen der Liste können Tage
+   * liegen. In der Zeit kann der Shop den Preis geändert, das Produkt auf
+   * „nicht verfügbar“ gesetzt oder ganz gelöscht haben. Die Liste darf dann
+   * nicht mit veralteten Zahlen weiterrechnen – sonst nennt die Bestellung
+   * einen Betrag, den es nicht mehr gibt.
+   *
+   * Läuft genau einmal beim Öffnen der Seite.
+   */
+  function abgleichen(): void {
+    const posten = lesen();
+    const behalten: Posten[] = [];
+    let geaendert = false;
+
+    for (const eintrag of posten) {
+      const produkt = produkte.get(eintrag.slug);
+
+      if (!produkt) {
+        meldungAnzeigen(texte.anfrageliste.produktUnbekannt);
+        geaendert = true;
+        continue;
+      }
+
+      if (!produkt.verfuegbar) {
+        meldungAnzeigen(texte.anfrageliste.produktVergriffen(produkt.name));
+        geaendert = true;
+        continue;
+      }
+
+      if (produkt.preisCent !== eintrag.preisCent) {
+        meldungAnzeigen(
+          texte.anfrageliste.preisGeaendert(
+            produkt.name,
+            preisFormatieren(eintrag.preisCent),
+            preisFormatieren(produkt.preisCent)
+          )
+        );
+        eintrag.preisCent = produkt.preisCent;
+        geaendert = true;
+      }
+
+      behalten.push(eintrag);
+    }
+
+    if (geaendert) schreiben(behalten);
+  }
+
+  /** Die Posten der Liste, angereichert mit den aktuellen Produktdaten. */
+  function zeilenBauen(): Zeile[] {
+    const zeilen: Zeile[] = [];
+    for (const eintrag of lesen()) {
+      const produkt = produkte.get(eintrag.slug);
+      if (produkt?.verfuegbar) {
+        zeilen.push({ produkt, menge: eintrag.menge, preisCent: eintrag.preisCent });
+      }
+    }
+    return zeilen;
+  }
+
+  function postenZeichnen(zeilen: Zeile[]): void {
+    if (!postenListe) return;
+    postenListe.replaceChildren();
+
+    for (const zeile of zeilen) {
+      const { produkt } = zeile;
+
+      const eintrag = document.createElement('li');
+
+      const name = document.createElement('div');
+      name.className = 'posten__name';
+      const link = document.createElement('a');
+      link.href = produkt.link;
+      link.textContent = produkt.name;
+      name.appendChild(link);
+
+      const einzeln = document.createElement('div');
+      einzeln.className = 'posten__einzeln';
+      einzeln.textContent = produkt.einheit
+        ? `${preisFormatieren(zeile.preisCent)} / ${produkt.einheit}`
+        : preisFormatieren(zeile.preisCent);
+
+      const steuerung = document.createElement('div');
+      steuerung.className = 'posten__steuerung';
+
+      const menge = document.createElement('input');
+      menge.type = 'number';
+      menge.className = 'posten__menge';
+      menge.min = '1';
+      menge.max = '99';
+      menge.step = '1';
+      menge.inputMode = 'numeric';
+      menge.value = String(zeile.menge);
+      menge.setAttribute('aria-label', texte.anfrageliste.mengeVon(produkt.name));
+      menge.addEventListener('change', () => {
+        const wert = Number(menge.value);
+        mengeSetzen(produkt.slug, Number.isFinite(wert) ? wert : 1);
+      });
+
+      const gesamt = document.createElement('div');
+      gesamt.className = 'posten__gesamt';
+      gesamt.textContent = preisFormatieren(zeile.preisCent * zeile.menge);
+
+      const weg = document.createElement('button');
+      weg.type = 'button';
+      weg.className = 'posten__weg';
+      weg.setAttribute('aria-label', texte.anfrageliste.entfernenVon(produkt.name));
+      weg.innerHTML =
+        '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">' +
+        '<path d="M6 7h12l-1 12H7L6 7Zm3 0V5h6v2M10 11v5M14 11v5" fill="none" stroke="currentColor" ' +
+        'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      weg.addEventListener('click', () => entfernen(produkt.slug));
+
+      steuerung.append(menge, gesamt, weg);
+      eintrag.append(name, einzeln, steuerung);
+      postenListe.appendChild(eintrag);
+    }
+  }
+
+  function messengerZeichnen(nachricht: string): void {
+    if (!messengerListe || !shop) return;
+    messengerListe.replaceChildren();
+
+    const beschriftung = {
+      telegram: texte.messenger.telegram,
+      threema: texte.messenger.threema,
+      signal: texte.messenger.signal,
+    } as const;
+
+    for (const knopf of messengerKnoepfe(shop, nachricht)) {
+      const eintrag = document.createElement('li');
+
+      const link = document.createElement('a');
+      link.href = knopf.href;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = beschriftung[knopf.dienst];
+
+      /*
+       * Wichtig: Der Link wird NICHT abgefangen. Der Browser öffnet ihn ganz
+       * normal, und das Kopieren läuft daneben. Würden wir den Klick abfangen,
+       * kopieren und danach selbst öffnen, hielte der Browser das für ein
+       * ungefragtes Fenster und blockierte es.
+       */
+      link.addEventListener('click', () => {
+        void kopierenUndMelden(nachricht, true);
+      });
+
+      eintrag.appendChild(link);
+
+      // Warum hier zusätzlich kopiert wird, muss dastehen – sonst wirkt es
+      // wie ein Fehler, wenn der Chat ohne Text aufgeht.
+      const grund = knopf.dienst === 'signal' ? texte.messenger.signalHinweis : !knopf.mitText ? texte.messenger.zuLang : '';
+      if (grund) {
+        const fussnote = document.createElement('small');
+        fussnote.className = 'senden__fussnote';
+        fussnote.textContent = grund;
+        eintrag.appendChild(fussnote);
+      }
+
+      messengerListe.appendChild(eintrag);
+    }
+  }
+
+  let rueckmeldungZuruecksetzen: number | undefined;
+
+  async function kopierenUndMelden(nachricht: string, vorMessenger: boolean): Promise<void> {
+    const geklappt = await kopieren(nachricht);
+
+    if (!rueckmeldung) return;
+    rueckmeldung.textContent = geklappt
+      ? vorMessenger
+        ? texte.messenger.kopiert
+        : texte.messenger.kopiertNurText
+      : texte.messenger.kopierenFehlgeschlagen;
+    rueckmeldung.hidden = false;
+
+    // Beim Fehlschlag die Vorschau aufklappen, damit von Hand kopiert werden kann.
+    if (!geklappt) {
+      const vorschau = vorschaufeld?.closest('details');
+      if (vorschau) vorschau.open = true;
+      vorschaufeld?.select();
+    }
+
+    window.clearTimeout(rueckmeldungZuruecksetzen);
+    rueckmeldungZuruecksetzen = window.setTimeout(() => {
+      rueckmeldung.hidden = true;
+    }, 8000);
+  }
+
+  function zeichnen(): void {
+    const zeilen = zeilenBauen();
+    const leer = zeilen.length === 0;
+
+    if (leerHinweis) leerHinweis.hidden = !leer;
+    if (inhalt) inhalt.hidden = leer;
+    if (leer) return;
+
+    postenZeichnen(zeilen);
+
+    if (summenfeld) summenfeld.textContent = preisFormatieren(zwischensumme(zeilen));
+
+    const nachricht = shop
+      ? nachrichtBauen(zeilen, shop, namensfeld?.value ?? '', anmerkungsfeld?.value ?? '')
+      : '';
+
+    if (vorschaufeld) vorschaufeld.value = nachricht;
+    messengerZeichnen(nachricht);
+
+    if (kopierKnopf) {
+      kopierKnopf.onclick = () => void kopierenUndMelden(nachricht, false);
+    }
+  }
+
+  leerenKnopf?.addEventListener('click', () => {
+    if (window.confirm(texte.anfrageliste.wirklichLeeren)) leeren();
+  });
+
+  // Name und Anmerkung gehen in den Bestelltext ein, deshalb muss er bei jeder
+  // Eingabe neu gebaut werden.
+  namensfeld?.addEventListener('input', zeichnen);
+  anmerkungsfeld?.addEventListener('input', zeichnen);
+
+  if (!speicherVerfuegbar()) meldungAnzeigen(texte.anfrageliste.speicherGesperrt);
+
+  beiAenderung(zeichnen);
+  abgleichen();
+  zeichnen();
+</script>

@@ -63,8 +63,9 @@ const aktuellerPfad = Astro.url.pathname;
         <path d="M6 7h12l-1 12H7L6 7Zm3 0a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
       </svg>
       <span class="kopf__anfrageliste-text">{texte.navigation.anfrageliste}</span>
-      {/* Die Anzahl füllt das Skript der Anfrageliste in Phase 3. Bis dahin
-          bleibt der Platz leer statt bei 0 zu stehen. */}
+      {/* Die Anzahl kommt aus dem localStorage und kann deshalb erst im
+          Browser gefüllt werden. Bis dahin bleibt der Platz leer – eine
+          vorgebaute 0 würde bei jedem Seitenwechsel kurz aufblitzen. */}
       <span class="kopf__anzahl" data-anfrageliste-anzahl hidden></span>
     </a>
   </div>
@@ -246,4 +247,25 @@ const aktuellerPfad = Astro.url.pathname;
     anpassen();
     breit.addEventListener('change', anpassen);
   })();
+</script>
+
+<script>
+  import { anzahl, beiAenderung } from '../scripts/liste';
+  import { texte } from '../lib/texte';
+
+  // Die Zahl neben dem Symbol. Sie wird auch aktualisiert, wenn der Besucher
+  // die Liste in einem anderen Tab ändert.
+  const anzeige = document.querySelector<HTMLElement>('[data-anfrageliste-anzahl]');
+  const link = document.querySelector<HTMLAnchorElement>('.kopf__anfrageliste');
+
+  function aktualisieren() {
+    if (!anzeige) return;
+    const wert = anzahl();
+    anzeige.textContent = wert > 0 ? String(wert) : '';
+    anzeige.hidden = wert === 0;
+    if (link) link.setAttribute('aria-label', texte.navigation.anfragelisteMitAnzahl(wert));
+  }
+
+  aktualisieren();
+  beiAenderung(aktualisieren);
 </script>

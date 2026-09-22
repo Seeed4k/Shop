@@ -8,14 +8,17 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "test": "esbuild src/scripts/nachricht.ts --bundle --format=esm --outfile=.test-build/nachricht.mjs --log-level=warning && node --test tests/*.test.mjs"
   },
   "dependencies": {
     "astro": "^7.3.3",
+    "qrcode-generator": "^2.0.4",
     "zod": "^4.6.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
+    "esbuild": "^0.25.0",
     "typescript": "^5.9.2"
   }
 }

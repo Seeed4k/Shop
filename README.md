@@ -24,6 +24,7 @@ Einstellungen – Name, Logo, Farben, Kontaktdaten und Messenger kommen nicht au
 - **Keystatic** als Redaktionssystem (siehe `docs/entscheidungen/001-cms-auswahl.md`)
 - **Netlify** als Standard-Hosting mit automatischem Build bei jeder Änderung
 - **Selbst gehostete Schriften** unter `public/schriften/`, SIL OFL 1.1 – keine Google-Fonts-Einbindung
+- **Drei Abhängigkeiten:** `astro`, `zod` (Prüfung der Inhalte), `qrcode-generator` (nur beim Build)
 
 ## Befehle
 
@@ -33,6 +34,7 @@ npm run dev      # Entwicklungsserver auf http://localhost:4321
 npm run build    # Website nach dist/ bauen
 npm run preview  # Gebaute Website lokal ansehen
 npm run check    # Typen und Astro-Komponenten prüfen
+npm test         # Prüfungen für Bestelltext und Messenger-Links
 ```
 
 ## Aufbau
@@ -82,6 +84,28 @@ Wer eine Schrift oder einen Hintergrund ergänzen will, trägt sie an zwei Stell
 `src/lib/schriften.ts` bzw. `src/lib/hintergruende.ts` (Beschriftung fürs Panel) und
 `src/styles/global.css` (die Gestaltung selbst).
 
+## Anfrageliste und Messenger
+
+Es gibt keinen Checkout. Der Besucher sammelt Artikel auf einer Anfrageliste und
+schickt sie über Telegram, Threema oder Signal.
+
+- **Die Liste liegt ausschließlich im Browser** des Besuchers (localStorage). Kein Server,
+  keine Cookies, keine Übertragung. Name und Anmerkung gehen nur in den Nachrichtentext.
+- **Beim Öffnen wird abgeglichen:** Geänderte Preise werden übernommen und gemeldet,
+  entfallene oder vergriffene Artikel entfernt und gemeldet. Sonst nennte die Bestellung
+  einen Betrag, den es nicht mehr gibt.
+- **Vor jedem Messenger-Klick wird kopiert.** Signal kann keinen Text vorausfüllen, und
+  der Samsung-Internet-Browser öffnet Threema-Links nicht – in beiden Fällen rettet die
+  Zwischenablage die Bestellung. Der Link selbst wird dabei nicht abgefangen, sonst
+  hielte der Browser das Öffnen für ein ungefragtes Fenster und blockierte es.
+- **Sehr lange Listen** werden nicht an den Link gehängt (Grenze: 2000 kodierte Zeichen).
+  Der Messenger öffnet dann nur den Chat, der Text liegt in der Zwischenablage.
+- **QR-Codes** für jeden aktivierten Messenger, erzeugt beim Build als eingebettetes SVG.
+  Für den Fall, dass der Messenger nur auf dem Handy installiert ist.
+
+Es sind keine Messenger-Widgets und keine fremden Skripte eingebunden – nur gewöhnliche
+Links, die der Besucher selbst anklickt.
+
 ## Zwei Entwurfsentscheidungen, die man kennen sollte
 
 **Preise stehen in Cent.** Das Feld heißt `preisCent`, 4,90 € sind also `490`.
@@ -103,7 +127,7 @@ beginnen mit `[Shop-Inhalte]`.
 
 - [x] **Phase 1** – Grundgerüst, Datenmodell, Beispielinhalte, Grundlayout
 - [x] **Phase 2** – Seiten und Design
-- [ ] **Phase 3** – Anfrageliste und Messenger
+- [x] **Phase 3** – Anfrageliste und Messenger
 - [ ] **Phase 4** – CMS einbauen
 - [ ] **Phase 5** – Feinschliff
 - [ ] **Phase 6** – Übergabe-Paket

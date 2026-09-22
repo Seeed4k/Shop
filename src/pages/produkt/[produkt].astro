@@ -14,8 +14,10 @@ import { texte } from '../../lib/texte';
  * einem Streifen mit Scroll-Einrastung, die Vorschaubilder sind Sprungmarken
  * darauf. Auf dem Handy lässt sich zusätzlich mit dem Finger wischen.
  *
- * Mengenwahl und Button tragen bereits die Daten-Attribute, die das Skript der
- * Anfrageliste in Phase 3 ausliest. Bis dahin sind sie noch ohne Funktion.
+ * Mengenwahl und Button legen den Artikel auf die Anfrageliste. Ohne
+ * JavaScript bleibt das Formular ohne Wirkung – deshalb wird es erst
+ * eingeblendet, wenn das Skript läuft. Ein Button, der nichts tut, wäre
+ * schlimmer als keiner.
  */
 export async function getStaticPaths() {
   const produkte = await produkteLaden();
@@ -84,6 +86,7 @@ const mehrereBilder = produkt.bilder.length > 1;
         {produkt.verfuegbar ? (
           <form
             class="bestellen"
+            hidden
             data-produkt-formular
             data-produkt-slug={produkt.slug}
             data-produkt-name={produkt.name}
@@ -95,7 +98,15 @@ const mehrereBilder = produkt.bilder.length > 1;
               <input id="menge" name="menge" type="number" min="1" max="99" step="1" value="1" inputmode="numeric" />
             </div>
             <button type="submit" class="knopf">{texte.produkt.zurAnfrageliste}</button>
+            <p class="bestellen__rueckmeldung" data-rueckmeldung role="status" hidden></p>
           </form>
+
+          <noscript>
+            <p class="ohne-skript">
+              Für die Anfrageliste wird JavaScript benötigt. Sie erreichen uns auch
+              direkt über die Kontaktdaten im Fußbereich.
+            </p>
+          </noscript>
         ) : (
           <p class="vergriffen">{texte.produkt.nichtBestellbar}</p>
         )}
@@ -256,6 +267,23 @@ const mehrereBilder = produkt.bilder.length > 1;
     border-color: var(--farbe-primaer-dunkel);
   }
 
+  .bestellen__rueckmeldung {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--farbe-akzent-dunkel);
+  }
+
+  .ohne-skript {
+    margin: 1.5rem 0;
+    padding: 0.9rem 1.1rem;
+    background: var(--farbe-flaeche-leise);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    color: var(--farbe-text-leise);
+  }
+
   .vergriffen {
     margin: 1.5rem 0;
     padding: 0.9rem 1.1rem;
@@ -292,3 +320,41 @@ const mehrereBilder = produkt.bilder.length > 1;
     font-size: 0.95rem;
   }
 </style>
+
+<script>
+  import { hinzufuegen } from '../../scripts/liste';
+  import { texte } from '../../lib/texte';
+
+  const formular = document.querySelector<HTMLFormElement>('[data-produkt-formular]');
+
+  if (formular) {
+    // Erst jetzt sichtbar: Ohne Skript hätte der Button keine Wirkung.
+    formular.hidden = false;
+
+    const rueckmeldung = formular.querySelector<HTMLElement>('[data-rueckmeldung]');
+    const mengenfeld = formular.querySelector<HTMLInputElement>('#menge');
+    let zuruecksetzen: number | undefined;
+
+    formular.addEventListener('submit', (ereignis) => {
+      ereignis.preventDefault();
+
+      const menge = Math.min(99, Math.max(1, Number(mengenfeld?.value ?? 1) || 1));
+
+      hinzufuegen(
+        formular.dataset.produktSlug!,
+        menge,
+        Number(formular.dataset.produktPreis)
+      );
+
+      if (rueckmeldung) {
+        // role="status" sorgt dafür, dass Screenreader die Meldung vorlesen.
+        rueckmeldung.textContent = texte.produkt.hinzugefuegt;
+        rueckmeldung.hidden = false;
+        window.clearTimeout(zuruecksetzen);
+        zuruecksetzen = window.setTimeout(() => {
+          rueckmeldung.hidden = true;
+        }, 4000);
+      }
+    });
+  }
+</script>

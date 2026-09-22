@@ -65,8 +65,20 @@ export const texte = {
       'Ihre Anfrage ist noch keine verbindliche Bestellung. Verbindlich wird sie erst, wenn der Shop sie Ihnen bestätigt.',
     datenschutzHinweis:
       'Name und Anmerkung werden nur in die Nachricht übernommen. Sie werden weder gespeichert noch an uns übertragen.',
-    preisGeaendert: 'Der Preis dieses Artikels hat sich geändert.',
-    produktEntfallen: 'Ein Artikel ist nicht mehr im Angebot und wurde von der Liste entfernt.',
+    preisGeaendert: (name: string, alt: string, neu: string) =>
+      `Der Preis von „${name}“ hat sich geändert: früher ${alt}, jetzt ${neu}. Die Liste wurde aktualisiert.`,
+    produktEntfallen: (name: string) =>
+      `„${name}“ ist nicht mehr im Angebot und wurde von der Liste entfernt.`,
+    produktVergriffen: (name: string) =>
+      `„${name}“ ist zurzeit nicht verfügbar und wurde von der Liste entfernt.`,
+    produktUnbekannt: 'Ein Artikel ist nicht mehr im Angebot und wurde von der Liste entfernt.',
+    artikelEinzeln: 'Artikel',
+    summeZeile: 'Zwischensumme',
+    mengeVon: (name: string) => `Menge von ${name}`,
+    entfernenVon: (name: string) => `${name} von der Liste entfernen`,
+    wirklichLeeren: 'Wirklich die ganze Liste leeren?',
+    speicherGesperrt:
+      'Ihr Browser erlaubt dieser Seite kein Speichern. Die Anfrageliste funktioniert, geht beim Schließen des Tabs aber verloren.',
   },
 
   messenger: {
@@ -76,9 +88,21 @@ export const texte = {
     signal: 'Über Signal senden',
     kopieren: 'Bestelltext kopieren',
     kopiert: 'Bestellung kopiert. Im Chat einfach einfügen und senden.',
+    kopiertNurText: 'Bestelltext kopiert. Sie können ihn jetzt überall einfügen.',
     kopierenFehlgeschlagen:
       'Das Kopieren hat nicht geklappt. Bitte markieren Sie den Text unten und kopieren Sie ihn von Hand.',
     keinerAktiv: 'Zurzeit ist kein Messenger hinterlegt. Bitte nehmen Sie über die Kontaktdaten Kontakt auf.',
+    // Signal kann keinen Text vorausfüllen, deshalb steht der Hinweis
+    // unabhängig von der Länge der Liste an diesem Button.
+    signalHinweis: 'Signal öffnet nur den Chat. Der Bestelltext liegt dann in der Zwischenablage – bitte im Chat einfügen.',
+    zuLang: 'Ihre Liste ist zu lang, um sie an den Link zu hängen. Der Messenger öffnet nur den Chat, der Bestelltext liegt in der Zwischenablage – bitte im Chat einfügen.',
+    vorschau: 'Bestelltext anzeigen',
+    qrUeberschrift: 'Chat mit dem Handy öffnen',
+    qrErklaerung:
+      'Scannen Sie den Code mit der Kamera Ihres Handys – der Chat öffnet sich dort. Praktisch, wenn der Messenger nur auf dem Handy installiert ist.',
+    qrNachtrag:
+      'Der Bestelltext liegt in der Zwischenablage dieses Geräts. Schreiben Sie Ihre Bestellung am Handy also von Hand, oder senden Sie sie von hier aus mit den Knöpfen oben.',
+    qrBeschriftung: (dienst: string, shop: string) => `QR-Code: ${dienst}-Chat mit ${shop} öffnen`,
   },
 
   fussbereich: {

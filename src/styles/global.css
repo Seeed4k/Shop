@@ -33,6 +33,7 @@
   --farbe-primaer-hell: color-mix(in oklab, var(--farbe-primaer) 10%, #ffffff);
   --farbe-primaer-dunkel: color-mix(in oklab, var(--farbe-primaer) 82%, #000000);
   --farbe-akzent-hell: color-mix(in oklab, var(--farbe-akzent) 12%, #ffffff);
+  --farbe-akzent-dunkel: color-mix(in oklab, var(--farbe-akzent) 82%, #000000);
 
   /* Rückfallstapel. Er steht hinter jeder geladenen Schrift und gilt allein,
      solange die Schriftdatei noch unterwegs ist. */
