@@ -104,6 +104,12 @@ nicht im fertigen Ergebnis – aber der Build meldet sie, damit man sie gelegent
 vorgebaute Dateien. React wird ausschließlich vom Panel gebraucht und kommt auf den
 Shop-Seiten nicht an. Die Seiten laden drei eigene Skripte von zusammen rund 6 KB.
 
+**Gesperrt, solange Keystatic Cloud fehlt.** Keystatic hängt `/keystatic` und
+`/api/keystatic` immer ein, auch im lokalen Modus – und der kennt keine Anmeldung. Die
+Middleware sperrt beides deshalb auf der Live-Seite, solange
+`PUBLIC_KEYSTATIC_CLOUD_PROJECT` nicht gesetzt ist. Auf dem eigenen Rechner bleibt das
+Panel offen. Geprüft durch direkten Aufruf der gebauten Netlify-Funktion und in `npm test`.
+
 **Keine Google Fonts im Panel.** Die Keystatic-Oberfläche lädt Inter von Google nach. Eine
 Middleware (`src/middleware.ts`) unterbindet das per Sicherheitsrichtlinie und stellt
 stattdessen die selbst gehostete Datei bereit.

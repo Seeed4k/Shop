@@ -9,7 +9,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "esbuild src/scripts/nachricht.ts --bundle --format=esm --outfile=.test-build/nachricht.mjs --log-level=warning && node --test tests/*.test.mjs",
+    "test": "esbuild src/scripts/nachricht.ts --bundle --format=esm --outfile=.test-build/nachricht.mjs --log-level=warning && esbuild src/lib/panel-sperre.ts --bundle --format=esm --outfile=.test-build/panel-sperre.mjs --log-level=warning && node --test tests/*.test.mjs",
     "neuer-shop": "node scripts/inhalte-zuruecksetzen.mjs"
   },
   "dependencies": {

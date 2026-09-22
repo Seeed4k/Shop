@@ -106,8 +106,11 @@ Problem, wenn tatsächlich einer aktiv sein soll.
 
 4. **Deploy** auslösen.
 
-> Ohne diese Variable läuft das Panel im lokalen Modus und der Kunde kann sich
-> nicht anmelden. Das ist der häufigste Fehler bei der Einrichtung.
+> Ohne diese Variable ist das Panel auf der Live-Seite **gesperrt** – wer
+> `/keystatic` aufruft, sieht „Verwaltung noch nicht eingerichtet“. Das ist
+> Absicht: Der lokale Modus von Keystatic kennt keine Anmeldung, und ohne Sperre
+> stünde eine Schreibschnittstelle offen im Netz. Der Shop selbst läuft auch
+> ohne die Variable normal.
 
 ---
 

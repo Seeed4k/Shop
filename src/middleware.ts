@@ -1,4 +1,5 @@
 import type { MiddlewareHandler } from 'astro';
+import { panelGesperrt } from './lib/panel-sperre';
 
 /**
  * Behandlung der Panel-Route /keystatic.
@@ -45,7 +46,30 @@ const EIGENE_SCHRIFT =
   `<style>@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;` +
   `font-display:swap;src:url('/schriften/inter.woff2') format('woff2')}</style>`;
 
+/** Was angezeigt wird, wenn jemand das nicht eingerichtete Panel aufruft. */
+const HINWEIS_NICHT_EINGERICHTET = `<!doctype html><html lang="de"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>Verwaltung nicht eingerichtet</title>
+<body style="font-family:system-ui,sans-serif;max-width:36rem;margin:4rem auto;padding:0 1rem;line-height:1.6">
+<h1>Verwaltung noch nicht eingerichtet</h1>
+<p>Die Anmeldung für die Shop-Verwaltung ist auf dieser Website noch nicht eingerichtet.
+Bis dahin ist die Verwaltung aus Sicherheitsgründen gesperrt.</p>
+<p>Einrichtung: siehe <code>NEUER-KUNDE.md</code>, Schritt 3 und 5 (Keystatic Cloud).</p>
+</body></html>`;
+
 export const onRequest: MiddlewareHandler = async (kontext, weiter) => {
+  // Zuerst die Sperre – bevor Keystatic überhaupt an die Anfrage kommt.
+  if (panelGesperrt(kontext.url.pathname, import.meta.env.PROD, import.meta.env.PUBLIC_KEYSTATIC_CLOUD_PROJECT)) {
+    const istApi = kontext.url.pathname.startsWith('/api/');
+    return new Response(istApi ? 'Nicht verfügbar' : HINWEIS_NICHT_EINGERICHTET, {
+      status: 404,
+      headers: {
+        'Content-Type': istApi ? 'text/plain; charset=utf-8' : 'text/html; charset=utf-8',
+        'X-Robots-Tag': 'noindex, nofollow',
+      },
+    });
+  }
+
   const antwort = await weiter();
 
   if (!kontext.url.pathname.startsWith('/keystatic')) return antwort;
