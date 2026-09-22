@@ -23,3 +23,10 @@
   for = "/keystatic/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
+
+# Die Sticker-Collage ändert sich nur mit dem Code. Eine Woche Zwischenspeicher
+# spart bei jedem Seitenwechsel die erneute Anfrage.
+[[headers]]
+  for = "/hintergrund/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

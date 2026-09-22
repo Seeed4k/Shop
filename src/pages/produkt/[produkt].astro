@@ -316,9 +316,13 @@ const strukturierteDaten = Astro.site
   .bestellen__rueckmeldung {
     flex-basis: 100%;
     margin: 0;
+    padding-left: 0.6rem;
     font-size: 0.9rem;
     font-weight: 600;
-    color: var(--farbe-akzent-dunkel);
+    /* Schriftfarbe bewusst neutral, die Akzentfarbe nur als Strich daneben:
+       Bei einem hellen Akzent wie Gelb wäre Text in Akzentfarbe unlesbar. */
+    color: var(--farbe-text);
+    border-left: 4px solid var(--farbe-akzent);
   }
 
   .ohne-skript {

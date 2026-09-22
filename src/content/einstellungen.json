@@ -1,13 +1,14 @@
 {
   "shop": {
     "name": "Hofladen Sonnenacker",
-    "website": "https://hofladen-sonnenacker.example",
+    "website": "https://shoppi1.netlify.app",
     "logo": "/src/bilder/shop/logo.png",
     "favicon": "/src/bilder/shop/favicon.png",
-    "primaerfarbe": "#7a4b2a",
-    "akzentfarbe": "#3f7d4f",
+    "primaerfarbe": "#d4007a",
+    "akzentfarbe": "#ffd60a",
     "schrift": "freundlich",
-    "hintergrund": "papier",
+    "hintergrund": "bild",
+    "hintergrundBild": "/src/bilder/shop/hintergrundBild.jpg",
     "startseiteUeberschrift": "Frisch vom Hof, direkt zu Ihnen",
     "startseiteText": "Wir backen jeden Morgen, machen unseren Käse selbst und füllen ein, was der Garten hergibt. Suchen Sie sich zusammen, was Sie mögen, und schicken Sie uns Ihre Anfrage per Messenger.",
     "startseiteBild": "/src/bilder/shop/startseiteBild.jpg",

@@ -1,11 +1,11 @@
 /**
  * Die Hintergrund-Gestaltungen, unter denen der Kunde im Panel wählen kann.
  *
- * Alle vier sind reines CSS – kein Bild, keine zusätzliche Anfrage, kein
- * Gewicht auf der Leitung. Und alle leiten ihren Farbton aus der Primärfarbe
- * ab. Der Kunde wählt also eine Stimmung, keine zweite Farbe, und das Ergebnis
- * passt automatisch zu seinem Shop. Die Regeln dazu stehen in
- * src/styles/global.css.
+ * Die ersten vier sind reines CSS und leiten ihren Farbton aus der
+ * Primärfarbe ab – der Kunde wählt eine Stimmung, keine zweite Farbe.
+ * Die Sticker-Collage ist eine beim Build erzeugte SVG-Datei mit fester
+ * Popfarben-Palette (src/lib/stickerbomb.ts). „Eigenes Bild“ zeigt ein
+ * hochgeladenes Bild. Die Gestaltung steht in src/styles/global.css.
  */
 
 export type Hintergrund = {
@@ -33,7 +33,12 @@ export const hintergruende = {
   sticker: {
     label: 'Sticker-Collage',
     beschreibung:
-      'Eine Fläche aus überlappenden Aufklebern in Ihren Farben. Auffällig – passt zu Streetwear, Plattenladen oder Skateshop, weniger zu einem ruhigen Sortiment.',
+      'Dicht überklebt in knalligen Popfarben. Auffällig – passt zu Streetwear, Plattenladen oder Skateshop, weniger zu einem ruhigen Sortiment.',
+  },
+  bild: {
+    label: 'Eigenes Bild',
+    beschreibung:
+      'Ein eigenes Foto oder eine Grafik als Hintergrund. Das Bild wird im Feld „Eigenes Hintergrundbild“ hochgeladen.',
   },
 } as const satisfies Record<string, Hintergrund>;
 

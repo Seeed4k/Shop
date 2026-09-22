@@ -54,6 +54,7 @@ const einstellungen = {
     akzentfarbe: '#3f7d4f',
     schrift: 'system',
     hintergrund: 'schlicht',
+    hintergrundBild: '',
     startseiteUeberschrift: '',
     startseiteText: '',
     startseiteBild: '',
