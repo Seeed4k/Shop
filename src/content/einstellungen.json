@@ -1,7 +1,7 @@
 {
   "shop": {
     "name": "Hofladen Sonnenacker",
-    "website": "https://hofladen-sonnenacker.example",
+    "website": "https://shoppi1.netlify.app",
     "logo": "/src/bilder/shop/logo.png",
     "favicon": "/src/bilder/shop/favicon.png",
     "primaerfarbe": "#7a4b2a",
