@@ -14,7 +14,14 @@ import { texte } from '../lib/texte';
  * Phase 2.
  */
 const kategorien = await kategorienLaden();
-const produkte = await produkteLaden();
+// „reihenfolge“ gilt laut Datenmodell innerhalb einer Kategorie. Für diese
+// vorläufige Gesamtliste wird deshalb zuerst nach Kategorie gruppiert, sonst
+// wirkt die Sortierung willkürlich.
+const alleProdukte = await produkteLaden();
+const kategorieRang = new Map(kategorien.map((kategorie, i) => [kategorie.slug, i]));
+const produkte = [...alleProdukte].sort(
+  (a, b) => (kategorieRang.get(a.kategorie.slug) ?? 99) - (kategorieRang.get(b.kategorie.slug) ?? 99)
+);
 const { shop } = einstellungen;
 const steuerhinweis = umsatzsteuerHinweis(einstellungen);
 ---

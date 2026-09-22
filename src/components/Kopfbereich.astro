@@ -191,25 +191,32 @@ const aktuellerPfad = Astro.url.pathname;
     flex-basis: 100%;
   }
 
-  /* Ab Tablet steht die Kategorieliste offen im Kopf, der Schalter entfällt. */
+  /* Ab Tablet steht die Kategorieliste offen im Kopf, der Schalter entfällt.
+     Das Skript setzt dort dauerhaft [open], deshalb müssen hier auch die
+     [open]-Regeln von oben zurückgenommen werden – sonst bräche der Kopf
+     auf drei Zeilen um. */
   @media (min-width: 48rem) {
     .menue__schalter {
       display: none;
     }
 
-    .menue {
+    .menue,
+    .menue[open] {
       order: 0;
       flex-basis: auto;
       margin-right: 0.5rem;
     }
 
+    .menue[open] .menue__liste {
+      order: 0;
+      flex-basis: auto;
+      width: auto;
+      padding-bottom: 0;
+    }
+
     .menue__liste ul {
       display: flex;
       gap: 0.25rem;
-    }
-
-    .menue__liste {
-      padding-bottom: 0 !important;
     }
   }
 
