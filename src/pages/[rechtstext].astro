@@ -21,7 +21,7 @@ const { rechtstext } = Astro.props;
 const { Content } = await render(rechtstext.eintrag);
 ---
 
-<Grundlayout titel={rechtstext.titel}>
+<Grundlayout titel={rechtstext.titel} beschreibung={`${rechtstext.titel} – rechtliche Angaben`}>
   <article class="huelle rechtstext">
     <h1>{rechtstext.titel}</h1>
     <Content />

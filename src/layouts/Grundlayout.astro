@@ -23,11 +23,15 @@ interface Props {
   beschreibung?: string;
   /** Vollständige URL eines Vorschaubildes zum Teilen. */
   vorschaubild?: string;
+  /** Bildbeschreibung des Vorschaubildes. */
+  vorschaubildAlt?: string;
+  /** Strukturierte Daten für Suchmaschinen, bereits als JSON-Text. */
+  strukturierteDaten?: string;
   /** Der Seitentitel wird um den Shopnamen ergänzt – außer auf der Startseite. */
   titelAlleinstehend?: boolean;
 }
 
-const { titel, beschreibung, vorschaubild, titelAlleinstehend = false } = Astro.props;
+const { titel, beschreibung, vorschaubild, vorschaubildAlt, strukturierteDaten, titelAlleinstehend = false } = Astro.props;
 
 const seitentitel = titelAlleinstehend ? titel : `${titel} – ${einstellungen.shop.name}`;
 
@@ -64,11 +68,23 @@ const kanonisch = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : un
     ))}
 
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="de_DE" />
     <meta property="og:title" content={seitentitel} />
     <meta property="og:site_name" content={einstellungen.shop.name} />
     {beschreibung && <meta property="og:description" content={beschreibung} />}
     {kanonisch && <meta property="og:url" content={kanonisch} />}
     {vorschaubild && <meta property="og:image" content={vorschaubild} />}
+    {vorschaubild && <meta property="og:image:width" content="1200" />}
+    {vorschaubild && <meta property="og:image:height" content="630" />}
+    {vorschaubild && vorschaubildAlt && <meta property="og:image:alt" content={vorschaubildAlt} />}
+
+    {/* Ohne diese Angabe zeigen manche Dienste nur einen kleinen Schnipsel
+        statt der großen Vorschau. Es wird dabei nichts nachgeladen. */}
+    <meta name="twitter:card" content={vorschaubild ? 'summary_large_image' : 'summary'} />
+
+    {strukturierteDaten && (
+      <script type="application/ld+json" set:html={strukturierteDaten} is:inline></script>
+    )}
 
     <meta name="generator" content={Astro.generator} />
 

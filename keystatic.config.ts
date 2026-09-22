@@ -270,10 +270,6 @@ export default config({
                 'Vollständig mit https://, zum Beispiel https://mein-hofladen.de. Wird für die Seitenübersicht bei Suchmaschinen und für das Vorschaubild beim Teilen gebraucht.',
             }),
             logo: shopBild('Logo', 'Quadratisch, mindestens 256 Pixel. Erscheint oben links.'),
-            logoAlt: fields.text({
-              label: 'Bildbeschreibung des Logos',
-              description: 'Zum Beispiel „Logo des Hofladens Sonnenacker“.',
-            }),
             favicon: shopBild('Symbol für den Browser-Tab', 'Quadratisch. Wird sehr klein angezeigt – am besten nur das Zeichen, ohne Schrift.'),
             primaerfarbe: fields.text({
               label: 'Primärfarbe',

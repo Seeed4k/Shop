@@ -12,7 +12,7 @@ import { texte } from '../lib/texte';
 const kategorien = await kategorienLaden();
 ---
 
-<Grundlayout titel={texte.fehlerseite.titel}>
+<Grundlayout titel={texte.fehlerseite.titel} beschreibung={texte.fehlerseite.text}>
   <div class="huelle seite">
     <p class="nummer">404</p>
     <h1>{texte.fehlerseite.titel}</h1>
@@ -44,7 +44,12 @@ const kategorien = await kategorienLaden();
     font-size: 3rem;
     font-weight: 700;
     line-height: 1;
-    color: var(--farbe-linie);
+    /* Bewusst eine echte Textfarbe statt der hellen Linienfarbe: Die Zahl ist
+       zwar schmückend, aber sichtbarer Text – und der braucht Kontrast.
+       In der hellen Variante kam sie auf 1,2:1, gefordert sind 3:1. Auch
+       eine abgeschwächte Deckkraft reichte nicht - sie senkt den Kontrast
+       genauso. */
+    color: var(--farbe-text-leise);
   }
 
   .text {

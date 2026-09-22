@@ -3,7 +3,6 @@
     "name": "Hofladen Sonnenacker",
     "website": "https://hofladen-sonnenacker.example",
     "logo": "/src/bilder/shop/logo.png",
-    "logoAlt": "Logo des Hofladens Sonnenacker",
     "favicon": "/src/bilder/shop/favicon.png",
     "primaerfarbe": "#7a4b2a",
     "akzentfarbe": "#3f7d4f",

@@ -53,7 +53,10 @@ const qrCodes = chatLinks(shopDaten).map((link) => ({
 }));
 ---
 
-<Grundlayout titel={texte.anfrageliste.ueberschrift}>
+<Grundlayout
+  titel={texte.anfrageliste.ueberschrift}
+  beschreibung={`Ihre gesammelten Artikel bei ${shop.name} – die Anfrage geht per Messenger.`}
+>
   <div class="huelle seite">
     <h1>{texte.anfrageliste.ueberschrift}</h1>
 

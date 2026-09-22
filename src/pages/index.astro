@@ -5,6 +5,7 @@ import Produktraster from '../components/Produktraster.astro';
 import { einstellungen } from '../lib/einstellungen';
 import { bildFinden } from '../lib/bilder';
 import { kategorienLaden, hervorgehobeneProdukte, kategorieLink } from '../lib/inhalte';
+import { vorschaubildErzeugen } from '../lib/vorschaubild';
 import { texte } from '../lib/texte';
 
 /**
@@ -14,11 +15,14 @@ const { shop } = einstellungen;
 const kategorien = await kategorienLaden();
 const empfehlungen = await hervorgehobeneProdukte();
 const startbild = bildFinden(shop.startseiteBild, 'Startseitenbild in den Einstellungen');
+const vorschaubild = await vorschaubildErzeugen(startbild, Astro.site);
 ---
 
 <Grundlayout
   titel={shop.name}
   beschreibung={shop.startseiteText.slice(0, 160) || `Das Angebot von ${shop.name}`}
+  vorschaubild={vorschaubild}
+  vorschaubildAlt={shop.startseiteBildAlt}
   titelAlleinstehend
 >
   <section class:list={['huelle', 'aufmacher', startbild && 'aufmacher--mit-bild']}>
@@ -34,6 +38,7 @@ const startbild = bildFinden(shop.startseiteBild, 'Startseitenbild in den Einste
         widths={[640, 960, 1400]}
         sizes="(min-width: 60rem) 34rem, 92vw"
         loading="eager"
+        fetchpriority="high"
         class="aufmacher__bild"
       />
     )}

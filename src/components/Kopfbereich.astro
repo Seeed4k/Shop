@@ -21,14 +21,21 @@ const aktuellerPfad = Astro.url.pathname;
 
 <header class="kopf">
   <div class="huelle kopf__inhalt">
-    <a class="kopf__marke" href="/" aria-label={texte.navigation.zurStartseite}>
+    {/*
+      Kein aria-label am Link: Der sichtbare Shopname ist der Linktext, und ein
+      abweichender Name daneben verwirrt Screenreader-Nutzer mehr, als er hilft.
+      Das Logo bekommt einen leeren Alternativtext, weil der Name unmittelbar
+      daneben steht – sonst würde er doppelt vorgelesen.
+    */}
+    <a class="kopf__marke" href="/">
       {logo && (
         <Image
           src={logo}
-          alt={einstellungen.shop.logoAlt ?? ''}
+          alt=""
           width={48}
           height={48}
           loading="eager"
+          fetchpriority="high"
           class="kopf__logo"
         />
       )}

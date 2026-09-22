@@ -214,7 +214,9 @@ export async function rechtstexteLaden(): Promise<Rechtstext[]> {
     .filter((eintrag) => {
       const hatInhalt = (eintrag.body ?? '').trim().length > 0;
       if (!hatInhalt) {
-        warnen('Rechtstexte', `„${eintrag.data.titel}“ ist leer und wird nicht verlinkt.`);
+        // Der Dateiname gehört dazu: Zwei leere Texte mit derselben Überschrift
+        // ergäben sonst nur eine Meldung, und einer bliebe unbemerkt.
+        warnen('Rechtstexte', `„${eintrag.data.titel}“ (${eintrag.id}.md) ist leer und wird nicht verlinkt.`);
       }
       return hatInhalt;
     })

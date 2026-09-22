@@ -3,7 +3,10 @@ import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import Grundlayout from '../../layouts/Grundlayout.astro';
 import Preisangabe from '../../components/Preisangabe.astro';
-import { produkteLaden, kategorieLink, type Produkt } from '../../lib/inhalte';
+import { produkteLaden, kategorieLink, produktLink, type Produkt } from '../../lib/inhalte';
+import { einstellungen } from '../../lib/einstellungen';
+import { vorschaubildErzeugen } from '../../lib/vorschaubild';
+import { alsJson } from '../../lib/einbetten';
 import { texte } from '../../lib/texte';
 
 /**
@@ -35,9 +38,52 @@ const { produkt } = Astro.props;
 const { Content } = await render(produkt.eintrag);
 const hatBeschreibung = (produkt.eintrag.body ?? '').trim().length > 0;
 const mehrereBilder = produkt.bilder.length > 1;
+
+const vorschaubild = await vorschaubildErzeugen(produkt.hauptbild.quelle, Astro.site);
+
+/*
+ * Strukturierte Daten nach schema.org.
+ *
+ * Damit können Suchmaschinen Preis und Verfügbarkeit direkt im Ergebnis
+ * anzeigen. Zwei Dinge sind hier wichtig:
+ *
+ * - Der Preis braucht einen Punkt als Dezimaltrennzeichen. Das deutsche Komma
+ *   wäre an dieser Stelle falsch; das Format ist maschinenlesbar, nicht für
+ *   Menschen gedacht.
+ * - Angegeben wird nur, was stimmt. Ein nicht verfügbares Produkt wird auch
+ *   als solches ausgezeichnet – alles andere wäre eine falsche Angabe
+ *   gegenüber dem Besucher.
+ */
+const strukturierteDaten = Astro.site
+  ? alsJson({
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: produkt.name,
+      description: produkt.kurzbeschreibung,
+      image: produkt.bilder.map((b) => new URL(b.quelle.src, Astro.site).href),
+      category: produkt.kategorie.name,
+      offers: {
+        '@type': 'Offer',
+        url: new URL(produktLink(produkt), Astro.site).href,
+        priceCurrency: 'EUR',
+        price: (produkt.preisCent / 100).toFixed(2),
+        availability: produkt.verfuegbar
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+        itemCondition: 'https://schema.org/NewCondition',
+        seller: { '@type': 'Organization', name: einstellungen.shop.name },
+      },
+    })
+  : undefined;
 ---
 
-<Grundlayout titel={produkt.name} beschreibung={produkt.kurzbeschreibung}>
+<Grundlayout
+  titel={produkt.name}
+  beschreibung={produkt.kurzbeschreibung}
+  vorschaubild={vorschaubild}
+  vorschaubildAlt={produkt.hauptbild.alt}
+  strukturierteDaten={strukturierteDaten}
+>
   <div class="huelle produkt">
     <nav class="brotkrume" aria-label="Sie befinden sich hier">
       <a href={kategorieLink(produkt.kategorie)}>{produkt.kategorie.name}</a>

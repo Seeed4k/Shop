@@ -11,15 +11,17 @@ interface Props {
   mitKategorie?: boolean;
   /** Wie viele Karten vorrangig geladen werden – die, die sofort sichtbar sind. */
   vorrangigAnzahl?: number;
+  /** Überschriftenebene der Karten, siehe Produktkarte. */
+  ebene?: 2 | 3;
 }
 
-const { produkte, mitKategorie = true, vorrangigAnzahl = 4 } = Astro.props;
+const { produkte, mitKategorie = true, vorrangigAnzahl = 4, ebene = 3 } = Astro.props;
 ---
 
 <ul class="raster">
   {produkte.map((produkt, index) => (
     <li>
-      <Produktkarte produkt={produkt} mitKategorie={mitKategorie} vorrangig={index < vorrangigAnzahl} />
+      <Produktkarte produkt={produkt} mitKategorie={mitKategorie} vorrangig={index < vorrangigAnzahl} ebene={ebene} />
     </li>
   ))}
 </ul>

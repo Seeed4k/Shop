@@ -18,9 +18,18 @@ interface Props {
   mitKategorie?: boolean;
   /** Vorrangig laden – für die ersten sichtbaren Karten. */
   vorrangig?: boolean;
+  /**
+   * Die Überschriftenebene des Produktnamens.
+   *
+   * Überschriften müssen ohne Sprung aufeinander folgen. Auf der Startseite
+   * steht über dem Raster ein h2 („Empfehlungen“), dort sind die Karten h3.
+   * Auf der Kategorieseite folgt das Raster direkt auf das h1, dort sind sie h2.
+   */
+  ebene?: 2 | 3;
 }
 
-const { produkt, mitKategorie = true, vorrangig = false } = Astro.props;
+const { produkt, mitKategorie = true, vorrangig = false, ebene = 3 } = Astro.props;
+const Ueberschrift = `h${ebene}` as 'h2' | 'h3';
 ---
 
 <article class:list={['karte', !produkt.verfuegbar && 'karte--vergriffen']}>
@@ -31,15 +40,16 @@ const { produkt, mitKategorie = true, vorrangig = false } = Astro.props;
       widths={[320, 480, 640]}
       sizes="(min-width: 64rem) 17rem, (min-width: 40rem) 45vw, 92vw"
       loading={vorrangig ? 'eager' : 'lazy'}
+      fetchpriority={vorrangig ? 'high' : 'auto'}
       class="karte__bild"
     />
     {!produkt.verfuegbar && <p class="karte__merker">{texte.produkt.nichtVerfuegbar}</p>}
   </div>
 
   <div class="karte__text">
-    <h3 class="karte__name">
+    <Ueberschrift class="karte__name">
       <a href={produktLink(produkt)}>{produkt.name}</a>
-    </h3>
+    </Ueberschrift>
     {mitKategorie && <p class="karte__kategorie">{produkt.kategorie.name}</p>}
     <p class="karte__kurz">{produkt.kurzbeschreibung}</p>
     <Preisangabe

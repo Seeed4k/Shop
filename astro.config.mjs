@@ -23,7 +23,16 @@ export default defineConfig({
    * Funktion beim Hoster, die nichts tut, solange niemand das Panel öffnet.
    */
   output: 'static',
-  adapter: netlify(),
+  /*
+   * imageCDN: false ist wichtig.
+   *
+   * Sonst leitet der Adapter alle Bilder über Netlifys Bilddienst
+   * (/.netlify/images?...). Sie würden dann bei jedem Aufruf umgerechnet
+   * statt einmal beim Build, und die Adressen funktionierten nur bei Netlify -
+   * ein Hosterwechsel bräche sämtliche Bilder. So entstehen fertige Dateien
+   * in modernen Formaten, die überall liegen können.
+   */
+  adapter: netlify({ imageCDN: false }),
 
   /*
    * React wird ausschließlich vom Keystatic-Panel gebraucht. Auf den

@@ -169,8 +169,41 @@ beginnen mit `[Shop-Inhalte]`.
 - [x] **Phase 2** – Seiten und Design
 - [x] **Phase 3** – Anfrageliste und Messenger
 - [x] **Phase 4** – CMS einbauen
-- [ ] **Phase 5** – Feinschliff
+- [x] **Phase 5** – Feinschliff
 - [ ] **Phase 6** – Übergabe-Paket
+
+## Qualität
+
+Gemessen mit Lighthouse, mobil, auf sechs Seitentypen (Start, Kategorie, Produkt,
+Anfrageliste, 404, Rechtsseite) – jeweils **100** in Performance, Barrierefreiheit,
+Best Practices und SEO. Auch mit dem aufwendigsten Hintergrund (Sticker-Collage).
+
+So lässt sich das nachstellen:
+
+```bash
+npm run build
+cd dist && python3 -m http.server 4400     # oder ein beliebiger statischer Server
+npx lighthouse http://127.0.0.1:4400/ --preset=desktop --view
+```
+
+**Bilder** werden beim Build in moderne Formate umgerechnet (WebP mit JPEG-Rückfall,
+mehrere Größen je Bild). Wichtig dabei: Der Netlify-Adapter würde sonst alle Bilder über
+Netlifys Bilddienst leiten – die Adressen funktionierten dann nur bei Netlify. Deshalb
+steht in `astro.config.mjs` ausdrücklich `imageCDN: false`.
+
+**SEO**: Titel und Beschreibung auf jeder Seite, Open-Graph-Daten mit Vorschaubild
+(1200 × 630), `sitemap.xml`, `robots.txt` und strukturierte Daten nach schema.org
+(`Product` mit Preis und Verfügbarkeit) auf den Produktseiten. Ohne hinterlegte Adresse
+der Website bleiben absolute Adressen weg, statt falsche anzugeben.
+
+**Barrierefreiheit**: semantisches HTML, Sprungmarke zum Inhalt, Alternativtexte als
+Pflichtfeld im Panel, sichtbarer Fokusrahmen, Überschriften ohne Ebenensprung, vollständige
+Tastaturbedienung. Der Build prüft zusätzlich den Kontrast der vom Kunden gewählten Farben
+und meldet, wenn auch die bessere Schriftfarbe unter 4,5:1 bleibt.
+
+**Randfälle**, jeweils geprüft: leere Kategorie (Hinweistext statt leerer Seite), sehr lange
+Namen (kein Überlaufen bis hinunter zu 320 px), kein aktivierter Messenger (Hinweis auf die
+Kontaktdaten, keine QR-Codes), leerer Rechtstext (keine Seite, kein Link im Fußbereich).
 
 ## Rechtliches
 

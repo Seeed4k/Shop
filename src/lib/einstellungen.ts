@@ -2,6 +2,7 @@ import * as z from 'zod';
 import roheEinstellungen from '../content/einstellungen.json';
 import { warnen } from './warnungen';
 import { freiwillig } from './zod-hilfen';
+import { kontrast, schriftAuf } from './farben';
 import { schriftartIds } from './schriften';
 import { hintergrundIds } from './hintergruende';
 
@@ -48,7 +49,6 @@ const einstellungenSchema = z.object({
     name: z.string().min(1, 'Der Shop braucht einen Namen.'),
     website: freiwillig(z.url('Die Adresse der Website muss vollständig sein, zum Beispiel https://mein-hofladen.de.')),
     logo: freiwillig(z.string()),
-    logoAlt: freiwillig(z.string()),
     favicon: freiwillig(z.string()),
     primaerfarbe: hexFarbe.default('#7a4b2a'),
     akzentfarbe: hexFarbe.default('#3f7d4f'),
@@ -187,6 +187,29 @@ function einstellungenLaden(): Einstellungen {
       'Einstellungen',
       'Kein Messenger ist aktiviert. Die Anfrageliste bietet dann nur die Kopier-Lösung an.'
     );
+  }
+
+  /*
+   * Kontrastprüfung der gewählten Farben.
+   *
+   * Die Schriftfarbe wird zwar automatisch hell oder dunkel gewählt, aber bei
+   * mittelhellen Tönen reicht auch die bessere von beiden nicht immer für die
+   * 4,5:1, die für kleinen Text gefordert sind. Das kann die Vorlage nicht
+   * beheben – die Farbe gehört dem Kunden. Sie kann aber darauf hinweisen.
+   */
+  for (const [name, farbe] of [
+    ['Primärfarbe', einstellungen.shop.primaerfarbe],
+    ['Akzentfarbe', einstellungen.shop.akzentfarbe],
+  ] as const) {
+    const verhaeltnis = kontrast(farbe, schriftAuf(farbe));
+    if (verhaeltnis < 4.5) {
+      warnen(
+        'Einstellungen',
+        `Die ${name} ${farbe} erreicht mit der bestmöglichen Schriftfarbe nur ${verhaeltnis.toFixed(
+          1
+        )}:1. Für kleinen Text sind 4,5:1 gefordert. Bitte eine etwas dunklere oder hellere Farbe wählen.`
+      );
+    }
   }
 
   if (!einstellungen.shop.website) {

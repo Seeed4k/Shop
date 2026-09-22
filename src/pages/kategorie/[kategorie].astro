@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import Grundlayout from '../../layouts/Grundlayout.astro';
 import Produktraster from '../../components/Produktraster.astro';
 import { kategorienLaden, produkteDerKategorie, type Kategorie, type Produkt } from '../../lib/inhalte';
+import { vorschaubildErzeugen } from '../../lib/vorschaubild';
 import { texte } from '../../lib/texte';
 
 /**
@@ -31,11 +32,14 @@ interface Props {
 }
 
 const { kategorie, produkte } = Astro.props;
+const vorschaubild = await vorschaubildErzeugen(kategorie.bild, Astro.site);
 ---
 
 <Grundlayout
   titel={kategorie.name}
   beschreibung={kategorie.beschreibung ?? `${kategorie.name} im Angebot`}
+  vorschaubild={vorschaubild}
+  vorschaubildAlt={kategorie.bildAlt}
 >
   <div class="huelle kopfzeile">
     {kategorie.bild && (
@@ -45,6 +49,7 @@ const { kategorie, produkte } = Astro.props;
         widths={[640, 960, 1400]}
         sizes="(min-width: 60rem) 60rem, 100vw"
         loading="eager"
+        fetchpriority="high"
         class="kopfzeile__bild"
       />
     )}
@@ -54,7 +59,7 @@ const { kategorie, produkte } = Astro.props;
 
   <section class="huelle abschnitt">
     {produkte.length > 0 ? (
-      <Produktraster produkte={produkte} mitKategorie={false} />
+      <Produktraster produkte={produkte} mitKategorie={false} ebene={2} />
     ) : (
       <p class="leer">{texte.kategorie.leer}</p>
     )}
