@@ -1,0 +1,25 @@
+# Einstellungen für das Hosting bei Netlify.
+#
+# Damit muss beim Anlegen einer neuen Website nichts von Hand eingetragen
+# werden - Netlify liest alles hier heraus.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Die Schriftdateien ändern sich nie. Ein Jahr Zwischenspeicher spart bei
+# jedem weiteren Besuch eine Anfrage.
+[[headers]]
+  for = "/schriften/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Das Admin-Panel gehört nicht in Suchergebnisse. Gesperrt ist es damit nicht -
+# dafür sorgt die Anmeldung.
+[[headers]]
+  for = "/keystatic/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

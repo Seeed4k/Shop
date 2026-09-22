@@ -8,6 +8,13 @@ separat, außerhalb der Website.
 Ein neuer Kundenshop entsteht durch Kopieren dieser Vorlage und Ausfüllen der
 Einstellungen – Name, Logo, Farben, Kontaktdaten und Messenger kommen nicht aus dem Code.
 
+## Die beiden Anleitungen
+
+- **[ANLEITUNG-KUNDE.md](ANLEITUNG-KUNDE.md)** – für den Shopbetreiber, in einfacher
+  Sprache: anmelden, Produkte pflegen, Preise eintragen, Bilder hochladen, Einstellungen.
+- **[NEUER-KUNDE.md](NEUER-KUNDE.md)** – Checkliste, um aus dieser Vorlage einen fertigen
+  Kundenshop zu machen. Inklusive der Frage, wem das Repository nach der Übergabe gehört.
+
 ## Grundsätze
 
 | Grundsatz | Wie er eingehalten wird |
@@ -38,6 +45,8 @@ npm run build    # Website nach dist/ bauen
 npm run preview  # Gebaute Website lokal ansehen
 npm run check    # Typen und Astro-Komponenten prüfen
 npm test         # Prüfungen für Bestelltext und Messenger-Links
+
+npm run neuer-shop -- --wirklich   # Beispielinhalte löschen (nur für einen neuen Kundenshop)
 ```
 
 ## Aufbau
@@ -170,7 +179,7 @@ beginnen mit `[Shop-Inhalte]`.
 - [x] **Phase 3** – Anfrageliste und Messenger
 - [x] **Phase 4** – CMS einbauen
 - [x] **Phase 5** – Feinschliff
-- [ ] **Phase 6** – Übergabe-Paket
+- [x] **Phase 6** – Übergabe-Paket
 
 ## Qualität
 
