@@ -59,3 +59,26 @@ export function bilderAufbereiten(
     })
     .filter((eintrag): eintrag is AufbereitetesBild => eintrag !== undefined);
 }
+
+/**
+ * Meldet Bilder, auf die kein Inhalt mehr verweist.
+ *
+ * Hintergrund: Löscht der Kunde im Panel ein Produkt, verschwindet die
+ * Inhaltsdatei – die hochgeladenen Bilder bleiben aber im Repository liegen.
+ * Auf der Website richten sie keinen Schaden an (unbenutzte Bilder landen
+ * nicht im fertigen Ergebnis), über die Jahre sammelt sich aber Ballast an.
+ * Deshalb der Hinweis im Build-Log.
+ */
+export function verwaisteBilderMelden(benutzt: Iterable<string>): void {
+  const inGebrauch = new Set(benutzt);
+  const verwaist = Object.keys(bildDateien).filter((pfad) => !inGebrauch.has(pfad));
+
+  if (verwaist.length === 0) return;
+
+  warnen(
+    'Bilder',
+    `${verwaist.length} Bild(er) werden von keinem Inhalt mehr verwendet und können gelöscht werden: ${verwaist
+      .slice(0, 8)
+      .join(', ')}${verwaist.length > 8 ? ' …' : ''}`
+  );
+}

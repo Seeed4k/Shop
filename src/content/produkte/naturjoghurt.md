@@ -7,7 +7,7 @@ grundpreis: 3,20 € / kg
 kurzbeschreibung: >-
   Stichfester Joghurt aus Vollmilch, im Pfandglas.
 bilder:
-  - bild: /src/bilder/joghurt-1.jpg
+  - bild: /src/bilder/produkte/naturjoghurt/bilder/0/bild.jpg
     alt: Glas Naturjoghurt mit Pfandglas-Deckel
 verfuegbar: false
 hervorgehoben: false

@@ -7,7 +7,7 @@ grundpreis: 5,42 € / l
 kurzbeschreibung: >-
   Süß-sauer eingelegt nach dem Rezept der Großmutter.
 bilder:
-  - bild: /src/bilder/gurken-1.jpg
+  - bild: /src/bilder/produkte/senfgurken/bilder/0/bild.jpg
     alt: Glas mit eingelegten Senfgurken
 verfuegbar: true
 hervorgehoben: false

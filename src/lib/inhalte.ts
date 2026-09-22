@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { bilderAufbereiten, bildFinden, type AufbereitetesBild } from './bilder';
+import { bilderAufbereiten, bildFinden, verwaisteBilderMelden, type AufbereitetesBild } from './bilder';
+import { einstellungen } from './einstellungen';
 import { warnen } from './warnungen';
 
 /**
@@ -144,6 +145,16 @@ async function inhalteAufbereiten() {
       warnen('Kategorien', `Die Kategorie „${kategorie.name}“ enthält kein Produkt.`);
     }
   }
+
+  // Alles, worauf irgendein Inhalt verweist – der Rest im Bilderordner ist
+  // übrig geblieben und wird gemeldet.
+  const benutzteBilder = new Set<string>();
+  for (const eintrag of roheKategorien) if (eintrag.data.bild) benutzteBilder.add(eintrag.data.bild);
+  for (const eintrag of roheProdukte) for (const b of eintrag.data.bilder) benutzteBilder.add(b.bild);
+  for (const pfad of [einstellungen.shop.logo, einstellungen.shop.favicon, einstellungen.shop.startseiteBild]) {
+    if (pfad) benutzteBilder.add(pfad);
+  }
+  verwaisteBilderMelden(benutzteBilder);
 
   zwischenspeicher = { kategorien, produkte };
   return zwischenspeicher;

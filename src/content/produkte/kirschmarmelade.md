@@ -7,9 +7,9 @@ grundpreis: 19,57 € / kg
 kurzbeschreibung: >-
   Aus Schattenmorellen von der eigenen Streuobstwiese.
 bilder:
-  - bild: /src/bilder/kirschmarmelade-1.jpg
+  - bild: /src/bilder/produkte/kirschmarmelade/bilder/0/bild.jpg
     alt: Glas Kirschmarmelade mit Stoffdeckel
-  - bild: /src/bilder/kirschmarmelade-2.jpg
+  - bild: /src/bilder/produkte/kirschmarmelade/bilder/1/bild.jpg
     alt: Kirschmarmelade auf einer Scheibe Brot
 verfuegbar: true
 hervorgehoben: true

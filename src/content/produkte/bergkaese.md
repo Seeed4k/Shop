@@ -7,9 +7,9 @@ grundpreis: 37,80 € / kg
 kurzbeschreibung: >-
   Würziger Hartkäse aus Rohmilch, ein Jahr im Naturkeller gereift.
 bilder:
-  - bild: /src/bilder/bergkaese-1.jpg
+  - bild: /src/bilder/produkte/bergkaese/bilder/0/bild.jpg
     alt: Stück Bergkäse mit sichtbarer Rinde
-  - bild: /src/bilder/bergkaese-2.jpg
+  - bild: /src/bilder/produkte/bergkaese/bilder/1/bild.jpg
     alt: Bergkäselaib im Reiferegal
 verfuegbar: true
 hervorgehoben: true

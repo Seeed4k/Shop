@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import * as z from 'zod';
 import { glob } from 'astro/loaders';
+import { freiwillig } from './lib/zod-hilfen';
 
 /**
  * Datenmodell der Shop-Vorlage.
@@ -16,7 +17,13 @@ import { glob } from 'astro/loaders';
  * Auflösung und die Warnung übernimmt src/lib/inhalte.ts.
  */
 
-/** Pfad, unter dem Keystatic hochgeladene Bilder ablegt. */
+/**
+ * Pfad, unter dem Keystatic hochgeladene Bilder ablegt.
+ *
+ * Darunter legt es je Bereich einen Ordner an, bei Sammlungen zusätzlich einen
+ * je Eintrag – etwa /src/bilder/produkte/bauernbrot/bild.jpg. Geprüft wird
+ * deshalb nur der Anfang.
+ */
 export const BILDER_ORDNER = '/src/bilder/';
 
 const bildPfad = z
@@ -29,13 +36,10 @@ const kategorien = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/kategorien' }),
   schema: z.object({
     name: z.string().min(1, 'Die Kategorie braucht einen Namen.'),
-    beschreibung: z.string().optional(),
-    bild: bildPfad.optional(),
-    bildAlt: z
-      .string()
-      .optional()
-      .describe('Alternativtext des Kategoriebildes für Screenreader'),
-    reihenfolge: z.number().int().optional(),
+    beschreibung: freiwillig(z.string()),
+    bild: freiwillig(bildPfad),
+    bildAlt: freiwillig(z.string()).describe('Alternativtext des Kategoriebildes für Screenreader'),
+    reihenfolge: freiwillig(z.number().int()),
     sichtbar: z.boolean().default(true),
   }),
 });
@@ -57,12 +61,12 @@ const produkte = defineCollection({
       .int('Der Preis muss eine ganze Zahl in Cent sein, zum Beispiel 490 für 4,90 €.')
       .min(0, 'Der Preis darf nicht negativ sein.'),
 
-    einheit: z.string().optional().describe('z. B. „Stück“ oder „500 g“'),
+    einheit: freiwillig(z.string()).describe('z. B. „Stück“ oder „500 g“'),
 
     // Pflicht bei Waren nach Gewicht oder Volumen. Das kann nur ein Mensch
     // entscheiden, deshalb wird es nicht erzwungen, sondern beim Build
     // angemahnt, wenn die Einheit nach einer Mengenangabe aussieht.
-    grundpreis: z.string().optional().describe('z. B. „3,98 € / kg“'),
+    grundpreis: freiwillig(z.string()).describe('z. B. „3,98 € / kg“'),
 
     kurzbeschreibung: z
       .string()
@@ -81,7 +85,7 @@ const produkte = defineCollection({
 
     verfuegbar: z.boolean().default(true),
     hervorgehoben: z.boolean().default(false),
-    reihenfolge: z.number().int().optional(),
+    reihenfolge: freiwillig(z.number().int()),
   }),
 });
 

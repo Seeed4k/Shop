@@ -24,7 +24,10 @@ Einstellungen – Name, Logo, Farben, Kontaktdaten und Messenger kommen nicht au
 - **Keystatic** als Redaktionssystem (siehe `docs/entscheidungen/001-cms-auswahl.md`)
 - **Netlify** als Standard-Hosting mit automatischem Build bei jeder Änderung
 - **Selbst gehostete Schriften** unter `public/schriften/`, SIL OFL 1.1 – keine Google-Fonts-Einbindung
-- **Drei Abhängigkeiten:** `astro`, `zod` (Prüfung der Inhalte), `qrcode-generator` (nur beim Build)
+- **Keystatic** als Admin-Panel unter `/keystatic`, Login per E-Mail über Keystatic Cloud
+- Abhängigkeiten: `astro`, `zod` (Prüfung der Inhalte), `qrcode-generator` (nur beim Build),
+  `@keystatic/core`, `@keystatic/astro`, `@astrojs/react`, `react`, `react-dom` (nur für das Panel),
+  `@astrojs/netlify` (Hosting)
 
 ## Befehle
 
@@ -59,6 +62,43 @@ public/
 **Der Dateiname ist der Slug.** Keystatic erzeugt ihn aus dem Namen, deshalb gibt es kein
 eigenes `slug`-Feld in den Dateien.
 
+## Das Admin-Panel
+
+Der Kunde pflegt alle Inhalte unter `/keystatic`. Die Feldbeschriftungen und Hilfetexte sind
+deutsch; die Bedienoberfläche von Keystatic selbst („Create“, „Save“) ist englisch.
+
+```bash
+npm run dev     # Panel unter http://localhost:4321/keystatic, schreibt direkt in die Dateien
+```
+
+Für den Kundenshop wird `PUBLIC_KEYSTATIC_CLOUD_PROJECT` beim Hoster gesetzt (siehe
+`.env.example`). Dann meldet sich der Kunde mit seiner E-Mail-Adresse an und braucht kein
+GitHub-Konto.
+
+**Wo Bilder landen.** Keystatic legt sie unter `src/bilder/` ab und schiebt bei Sammlungen
+den Namen des Eintrags in den Pfad:
+
+```
+src/bilder/shop/logo.png                              Einstellungen (kein Eintragsname)
+src/bilder/kategorien/brot/bild.jpg                   Kategorie „brot“
+src/bilder/produkte/bauernbrot/bilder/0/bild.jpg      Produkt „bauernbrot“, erstes Bild
+```
+
+Das ist Keystatics Regel, keine Wahl – wer die Pfade in `keystatic.config.ts` ändert, muss
+`src/content.config.ts` und die vorhandenen Dateien mitziehen.
+
+**Nach dem Löschen bleiben Bilder liegen.** Löscht der Kunde ein Produkt, verschwindet die
+Inhaltsdatei, der Bildordner bleibt. Das schadet der Website nicht – unbenutzte Bilder landen
+nicht im fertigen Ergebnis – aber der Build meldet sie, damit man sie gelegentlich aufräumen kann.
+
+**Eine serverseitige Route.** Nur `/keystatic` läuft beim Aufruf; alle Shop-Seiten sind
+vorgebaute Dateien. React wird ausschließlich vom Panel gebraucht und kommt auf den
+Shop-Seiten nicht an. Die Seiten laden drei eigene Skripte von zusammen rund 6 KB.
+
+**Keine Google Fonts im Panel.** Die Keystatic-Oberfläche lädt Inter von Google nach. Eine
+Middleware (`src/middleware.ts`) unterbindet das per Sicherheitsrichtlinie und stellt
+stattdessen die selbst gehostete Datei bereit.
+
 ## Aussehen: was der Kunde selbst einstellen kann
 
 Über das Panel, ohne eine Zeile Code:
@@ -67,7 +107,7 @@ eigenes `slug`-Feld in den Dateien.
 |-------------|---------|
 | Primär- und Akzentfarbe | Kopfbereich, Links, Preise, Buttons. Die Schriftfarbe darauf wird aus der Helligkeit berechnet, damit sie auch bei einer hellen Farbe lesbar bleibt. Linien und ruhige Flächen nehmen automatisch einen Hauch der Primärfarbe auf. |
 | Schriftart | Fünf Auswahlmöglichkeiten: Systemschrift, Modern (Inter), Klassisch (Lora + Inter), Freundlich (Nunito), Traditionell (Source Serif 4). |
-| Hintergrund | Vier Auswahlmöglichkeiten: Schlicht weiß, Warmes Papier, Sanfter Verlauf, Feines Punktmuster. |
+| Hintergrund | Fünf Auswahlmöglichkeiten: Schlicht weiß, Warmes Papier, Sanfter Verlauf, Feines Punktmuster, Sticker-Collage. |
 
 **Warum Auswahllisten und keine Freitextfelder?** Der Kunde wählt eine Stimmung, keine
 Schriftnamen und keine zweite Farbe. Die Hintergründe leiten ihren Ton über `color-mix`
@@ -128,7 +168,7 @@ beginnen mit `[Shop-Inhalte]`.
 - [x] **Phase 1** – Grundgerüst, Datenmodell, Beispielinhalte, Grundlayout
 - [x] **Phase 2** – Seiten und Design
 - [x] **Phase 3** – Anfrageliste und Messenger
-- [ ] **Phase 4** – CMS einbauen
+- [x] **Phase 4** – CMS einbauen
 - [ ] **Phase 5** – Feinschliff
 - [ ] **Phase 6** – Übergabe-Paket
 

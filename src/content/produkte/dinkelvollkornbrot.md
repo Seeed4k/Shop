@@ -7,7 +7,7 @@ grundpreis: 6,93 € / kg
 kurzbeschreibung: >-
   Vollkornbrot aus frisch gemahlenem Dinkel, mild und nussig.
 bilder:
-  - bild: /src/bilder/dinkelvollkorn-1.jpg
+  - bild: /src/bilder/produkte/dinkelvollkornbrot/bilder/0/bild.jpg
     alt: Dinkelvollkornbrot in Scheiben geschnitten
 verfuegbar: true
 hervorgehoben: false

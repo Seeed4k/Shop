@@ -6,7 +6,7 @@ einheit: Stück
 kurzbeschreibung: >-
   Handgeschlungen, mit echter Butter und grobem Salz.
 bilder:
-  - bild: /src/bilder/butterbrezel-1.jpg
+  - bild: /src/bilder/produkte/butterbrezel/bilder/0/bild.jpg
     alt: Frisch gebackene Butterbrezel mit grobem Salz
 verfuegbar: true
 hervorgehoben: false

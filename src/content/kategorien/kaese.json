@@ -1,7 +1,7 @@
 {
   "name": "Käse & Milch",
   "beschreibung": "Von unseren zwölf Kühen, in der eigenen Hofkäserei verarbeitet.",
-  "bild": "/src/bilder/kategorie-kaese.jpg",
+  "bild": "/src/bilder/kategorien/kaese/bild.jpg",
   "bildAlt": "Käselaibe im Reiferegal der Hofkäserei",
   "reihenfolge": 2,
   "sichtbar": true

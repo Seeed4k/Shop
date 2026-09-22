@@ -1,6 +1,7 @@
 import * as z from 'zod';
 import roheEinstellungen from '../content/einstellungen.json';
 import { warnen } from './warnungen';
+import { freiwillig } from './zod-hilfen';
 import { schriftartIds } from './schriften';
 import { hintergrundIds } from './hintergruende';
 
@@ -24,34 +25,31 @@ const messengerSchema = z.object({
   telegram: z.object({
     aktiv: z.boolean().default(false),
     // Ohne führendes @ – das setzt die Vorlage selbst, wenn nötig.
-    benutzername: z
-      .string()
-      .regex(/^[A-Za-z0-9_]{5,32}$/, 'Der Telegram-Benutzername besteht aus 5 bis 32 Buchstaben, Ziffern oder Unterstrichen – ohne das @ davor.')
-      .optional(),
+    benutzername: freiwillig(
+      z.string().regex(/^[A-Za-z0-9_]{5,32}$/, 'Der Telegram-Benutzername besteht aus 5 bis 32 Buchstaben, Ziffern oder Unterstrichen – ohne das @ davor.')
+    ),
   }).default({ aktiv: false }),
   threema: z.object({
     aktiv: z.boolean().default(false),
-    id: z
-      .string()
-      .regex(/^[A-Z0-9]{8}$/, 'Eine Threema-ID besteht aus genau 8 Großbuchstaben oder Ziffern.')
-      .optional(),
+    id: freiwillig(
+      z.string().regex(/^[A-Z0-9]{8}$/, 'Eine Threema-ID besteht aus genau 8 Großbuchstaben oder Ziffern.')
+    ),
   }).default({ aktiv: false }),
   signal: z.object({
     aktiv: z.boolean().default(false),
-    telefon: z
-      .string()
-      .regex(/^\+[1-9][0-9]{6,20}$/, 'Die Signal-Nummer wird international angegeben, zum Beispiel +4915112345678.')
-      .optional(),
+    telefon: freiwillig(
+      z.string().regex(/^\+[1-9][0-9]{6,20}$/, 'Die Signal-Nummer wird international angegeben, zum Beispiel +4915112345678.')
+    ),
   }).default({ aktiv: false }),
 });
 
 const einstellungenSchema = z.object({
   shop: z.object({
     name: z.string().min(1, 'Der Shop braucht einen Namen.'),
-    website: z.union([z.url('Die Adresse der Website muss vollständig sein, zum Beispiel https://mein-hofladen.de.'), z.literal('')]).optional(),
-    logo: z.string().optional(),
-    logoAlt: z.string().optional(),
-    favicon: z.string().optional(),
+    website: freiwillig(z.url('Die Adresse der Website muss vollständig sein, zum Beispiel https://mein-hofladen.de.')),
+    logo: freiwillig(z.string()),
+    logoAlt: freiwillig(z.string()),
+    favicon: freiwillig(z.string()),
     primaerfarbe: hexFarbe.default('#7a4b2a'),
     akzentfarbe: hexFarbe.default('#3f7d4f'),
 
@@ -66,13 +64,13 @@ const einstellungenSchema = z.object({
       .default('schlicht'),
     startseiteUeberschrift: z.string().default(''),
     startseiteText: z.string().default(''),
-    startseiteBild: z.string().optional(),
-    startseiteBildAlt: z.string().optional(),
+    startseiteBild: freiwillig(z.string()),
+    startseiteBildAlt: freiwillig(z.string()),
   }),
   kontakt: z.object({
     inhaber: z.string().default(''),
     adresse: z.string().default(''),
-    email: z.union([z.email('Die E-Mail-Adresse im Kontakt ist nicht vollständig.'), z.literal('')]).optional(),
+    email: freiwillig(z.email('Die E-Mail-Adresse im Kontakt ist nicht vollständig.')),
     telefon: z.string().default(''),
   }),
   messenger: messengerSchema,

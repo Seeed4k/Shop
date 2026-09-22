@@ -7,9 +7,9 @@ grundpreis: 6,13 € / kg
 kurzbeschreibung: >-
   Weizenmischbrot mit gerösteten Sonnenblumenkernen.
 bilder:
-  - bild: /src/bilder/sonnenblumenbrot-1.jpg
+  - bild: /src/bilder/produkte/sonnenblumenbrot/bilder/0/bild.jpg
     alt: Sonnenblumenbrot mit Kernen in der Kruste
-  - bild: /src/bilder/sonnenblumenbrot-2.jpg
+  - bild: /src/bilder/produkte/sonnenblumenbrot/bilder/1/bild.jpg
     alt: Aufgeschnittenes Sonnenblumenbrot
 verfuegbar: true
 hervorgehoben: true

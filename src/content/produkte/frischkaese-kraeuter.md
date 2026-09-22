@@ -7,7 +7,7 @@ grundpreis: 19,00 € / kg
 kurzbeschreibung: >-
   Cremiger Frischkäse mit Schnittlauch, Petersilie und Kerbel aus dem Garten.
 bilder:
-  - bild: /src/bilder/frischkaese-1.jpg
+  - bild: /src/bilder/produkte/frischkaese-kraeuter/bilder/0/bild.jpg
     alt: Becher mit Kräuterfrischkäse
 verfuegbar: true
 hervorgehoben: false

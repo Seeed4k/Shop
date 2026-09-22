@@ -7,7 +7,7 @@ grundpreis: 18,26 € / kg
 kurzbeschreibung: >-
   Klares Gelee aus Boskop, mit einem Zweig Rosmarin abgeschmeckt.
 bilder:
-  - bild: /src/bilder/apfelgelee-1.jpg
+  - bild: /src/bilder/produkte/apfelgelee/bilder/0/bild.jpg
     alt: Glas mit goldgelbem Apfelgelee
 verfuegbar: true
 hervorgehoben: false
