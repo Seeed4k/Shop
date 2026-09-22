@@ -1,0 +1,44 @@
+---
+import Produktkarte from './Produktkarte.astro';
+import type { Produkt } from '../lib/inhalte';
+
+/**
+ * Das Produktraster. Es wird auf der Startseite und auf jeder Kategorieseite
+ * verwendet, damit Karten überall gleich groß und gleich angeordnet sind.
+ */
+interface Props {
+  produkte: Produkt[];
+  mitKategorie?: boolean;
+  /** Wie viele Karten vorrangig geladen werden – die, die sofort sichtbar sind. */
+  vorrangigAnzahl?: number;
+}
+
+const { produkte, mitKategorie = true, vorrangigAnzahl = 4 } = Astro.props;
+---
+
+<ul class="raster">
+  {produkte.map((produkt, index) => (
+    <li>
+      <Produktkarte produkt={produkt} mitKategorie={mitKategorie} vorrangig={index < vorrangigAnzahl} />
+    </li>
+  ))}
+</ul>
+
+<style>
+  .raster {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15.5rem), 1fr));
+  }
+
+  .raster > li {
+    display: flex;
+  }
+
+  .raster > li > :global(*) {
+    width: 100%;
+  }
+</style>

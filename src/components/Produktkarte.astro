@@ -1,0 +1,149 @@
+---
+import { Image } from 'astro:assets';
+import Preisangabe from './Preisangabe.astro';
+import { produktLink, type Produkt } from '../lib/inhalte';
+import { texte } from '../lib/texte';
+
+/**
+ * Die Produktkarte für Übersichten – Startseite und Kategorieseite.
+ *
+ * Die ganze Karte ist ein Link. Damit trotzdem nur der Produktname als
+ * Linktext vorgelesen wird, liegt der Link auf dem Namen und wird per
+ * ::after über die Karte gezogen. Das ist der Weg, der ohne verschachtelte
+ * Links auskommt und für Screenreader sauber bleibt.
+ */
+interface Props {
+  produkt: Produkt;
+  /** Die Kategorie mit anzeigen? Auf der Kategorieseite wäre sie überflüssig. */
+  mitKategorie?: boolean;
+  /** Vorrangig laden – für die ersten sichtbaren Karten. */
+  vorrangig?: boolean;
+}
+
+const { produkt, mitKategorie = true, vorrangig = false } = Astro.props;
+---
+
+<article class:list={['karte', !produkt.verfuegbar && 'karte--vergriffen']}>
+  <div class="karte__bildrahmen">
+    <Image
+      src={produkt.hauptbild.quelle}
+      alt={produkt.hauptbild.alt}
+      widths={[320, 480, 640]}
+      sizes="(min-width: 64rem) 17rem, (min-width: 40rem) 45vw, 92vw"
+      loading={vorrangig ? 'eager' : 'lazy'}
+      class="karte__bild"
+    />
+    {!produkt.verfuegbar && <p class="karte__merker">{texte.produkt.nichtVerfuegbar}</p>}
+  </div>
+
+  <div class="karte__text">
+    <h3 class="karte__name">
+      <a href={produktLink(produkt)}>{produkt.name}</a>
+    </h3>
+    {mitKategorie && <p class="karte__kategorie">{produkt.kategorie.name}</p>}
+    <p class="karte__kurz">{produkt.kurzbeschreibung}</p>
+    <Preisangabe
+      preisCent={produkt.preisCent}
+      einheit={produkt.einheit}
+      grundpreis={produkt.grundpreis}
+    />
+  </div>
+</article>
+
+<style>
+  .karte {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--farbe-flaeche);
+    border: 1px solid var(--farbe-linie);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+
+  .karte:hover {
+    border-color: var(--farbe-primaer);
+    box-shadow: var(--schatten);
+  }
+
+  /* Der Fokusrahmen muss die ganze Karte umfassen, nicht nur den Namen –
+     sonst sieht man bei Tastaturbedienung nicht, wo man ist. */
+  .karte:has(a:focus-visible) {
+    outline: 3px solid var(--farbe-akzent);
+    outline-offset: 2px;
+  }
+
+  .karte__bildrahmen {
+    position: relative;
+  }
+
+  .karte__bild {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .karte--vergriffen .karte__bild {
+    filter: grayscale(0.7);
+    opacity: 0.75;
+  }
+
+  .karte__merker {
+    position: absolute;
+    left: 0;
+    bottom: 0.75rem;
+    margin: 0;
+    padding: 0.3rem 0.7rem;
+    background: var(--farbe-warnung);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  .karte__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+    padding: 0.85rem 0.95rem 1rem;
+  }
+
+  .karte__name {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+
+  .karte__name a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Zieht den Link über die gesamte Karte, ohne den Linktext zu verwässern. */
+  .karte__name a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .karte__name a:hover {
+    text-decoration: underline;
+  }
+
+  .karte__kategorie {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--farbe-text-leise);
+  }
+
+  .karte__kurz {
+    margin: 0.15rem 0 0.6rem;
+    font-size: 0.92rem;
+    color: var(--farbe-text-leise);
+    /* Schiebt den Preis aller Karten einer Reihe auf dieselbe Höhe. */
+    flex: 1;
+  }
+</style>

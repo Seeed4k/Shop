@@ -1,0 +1,69 @@
+---
+import { einstellungen } from '../lib/einstellungen';
+import { preisFormatieren, umsatzsteuerHinweis } from '../lib/preis';
+import { texte } from '../lib/texte';
+
+/**
+ * Preis mit allem, was rechtlich daran gehört.
+ *
+ * Der Umsatzsteuer-Hinweis steht laut Briefing an jedem Preis und ergibt sich
+ * aus dem Modus in den Einstellungen. Der Grundpreis ist bei Waren nach
+ * Gewicht oder Volumen vorgeschrieben; fehlt er dort, meldet der Build das
+ * bereits beim Laden der Inhalte.
+ */
+interface Props {
+  preisCent: number;
+  einheit?: string;
+  grundpreis?: string;
+  /** Größere Darstellung für die Produktseite. */
+  gross?: boolean;
+}
+
+const { preisCent, einheit, grundpreis, gross = false } = Astro.props;
+const steuerhinweis = umsatzsteuerHinweis(einstellungen);
+---
+
+<div class:list={['preis', gross && 'preis--gross']}>
+  <p class="preis__betrag">
+    {/* Das {' '} ist nötig: Astro verwirft den Zeilenumbruch zwischen zwei
+        Ausdrücken, sonst klebte die Einheit am Preis. */}
+    {preisFormatieren(preisCent)}
+    {einheit && <>{' '}<span class="preis__einheit">/ {einheit}</span></>}
+  </p>
+  <p class="preis__zusatz">{steuerhinweis}</p>
+  {grundpreis && <p class="preis__zusatz">{texte.produkt.grundpreis}: {grundpreis}</p>}
+</div>
+
+<style>
+  .preis__betrag {
+    margin: 0;
+    font-weight: 650;
+    font-size: 1.05rem;
+    color: var(--farbe-primaer-dunkel);
+  }
+
+  .preis__einheit {
+    font-weight: 400;
+    font-size: 0.95rem;
+    color: var(--farbe-text-leise);
+  }
+
+  .preis__zusatz {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--farbe-text-leise);
+  }
+
+  .preis--gross .preis__betrag {
+    font-size: 1.7rem;
+  }
+
+  .preis--gross .preis__einheit {
+    font-size: 1.05rem;
+  }
+
+  .preis--gross .preis__zusatz {
+    font-size: 0.9rem;
+  }
+</style>

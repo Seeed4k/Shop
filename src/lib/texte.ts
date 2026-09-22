@@ -24,11 +24,16 @@ export const texte = {
     abKategorie: 'Kategorie',
     grundpreis: 'Grundpreis',
     nichtVerfuegbar: 'Zurzeit nicht verfügbar',
+    nichtBestellbar: 'Dieses Produkt ist zurzeit nicht verfügbar und kann nicht angefragt werden.',
     verfuegbar: 'Verfügbar',
     menge: 'Menge',
     zurAnfrageliste: 'Zur Anfrageliste hinzufügen',
     hinzugefuegt: 'Zur Anfrageliste hinzugefügt',
     keineBeschreibung: 'Zu diesem Produkt gibt es noch keine ausführliche Beschreibung.',
+    galerie: 'Bilder des Produkts',
+    bildWaehlen: (nummer: number, gesamt: number) => `Bild ${nummer} von ${gesamt} anzeigen`,
+    zurueckZu: (kategorie: string) => `Zurück zu ${kategorie}`,
+    weitereProdukte: (kategorie: string) => `Weitere Produkte aus ${kategorie}`,
   },
 
   kategorie: {
@@ -39,10 +44,14 @@ export const texte = {
   startseite: {
     hervorgehoben: 'Empfehlungen',
     kategorienUeberschrift: 'Unser Angebot',
+    keineProdukte: 'Es sind noch keine Produkte eingetragen.',
   },
 
   anfrageliste: {
     ueberschrift: 'Anfrageliste',
+    inArbeit: 'Die Anfrageliste wird gerade gebaut. Ab Phase 3 können Sie hier Artikel sammeln und per Messenger senden.',
+    bestellablaufUeberschrift: 'So läuft die Bestellung ab',
+    versandUeberschrift: 'Versand und Abholung',
     leer: 'Ihre Anfrageliste ist noch leer.',
     weiterStoebern: 'Zum Angebot',
     entfernen: 'Artikel entfernen',

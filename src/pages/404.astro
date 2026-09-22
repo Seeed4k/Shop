@@ -1,0 +1,71 @@
+---
+import Grundlayout from '../layouts/Grundlayout.astro';
+import { kategorienLaden, kategorieLink } from '../lib/inhalte';
+import { texte } from '../lib/texte';
+
+/**
+ * 404-Seite.
+ *
+ * Statt einer Sackgasse bietet sie die Kategorien an – wer über einen alten
+ * Link kommt, findet so trotzdem weiter.
+ */
+const kategorien = await kategorienLaden();
+---
+
+<Grundlayout titel={texte.fehlerseite.titel}>
+  <div class="huelle seite">
+    <p class="nummer">404</p>
+    <h1>{texte.fehlerseite.titel}</h1>
+    <p class="text">{texte.fehlerseite.text}</p>
+
+    <p><a href="/">{texte.fehlerseite.zurueck}</a></p>
+
+    {kategorien.length > 0 && (
+      <nav class="weiter" aria-label={texte.navigation.kategorien}>
+        <h2>{texte.navigation.kategorien}</h2>
+        <ul>
+          {kategorien.map((kategorie) => (
+            <li><a href={kategorieLink(kategorie)}>{kategorie.name}</a></li>
+          ))}
+        </ul>
+      </nav>
+    )}
+  </div>
+</Grundlayout>
+
+<style>
+  .seite {
+    max-width: 40rem;
+    padding-block: 3rem 2rem;
+  }
+
+  .nummer {
+    margin: 0;
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--farbe-linie);
+  }
+
+  .text {
+    font-size: 1.05rem;
+    color: var(--farbe-text-leise);
+  }
+
+  .weiter {
+    margin-top: 2.5rem;
+  }
+
+  .weiter h2 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .weiter ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    line-height: 2;
+  }
+</style>

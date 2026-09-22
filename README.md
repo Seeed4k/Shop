@@ -102,7 +102,7 @@ beginnen mit `[Shop-Inhalte]`.
 ## Stand der Arbeit
 
 - [x] **Phase 1** – Grundgerüst, Datenmodell, Beispielinhalte, Grundlayout
-- [ ] **Phase 2** – Seiten und Design
+- [x] **Phase 2** – Seiten und Design
 - [ ] **Phase 3** – Anfrageliste und Messenger
 - [ ] **Phase 4** – CMS einbauen
 - [ ] **Phase 5** – Feinschliff

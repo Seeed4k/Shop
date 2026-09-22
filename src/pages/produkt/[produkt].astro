@@ -1,0 +1,294 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import Grundlayout from '../../layouts/Grundlayout.astro';
+import Preisangabe from '../../components/Preisangabe.astro';
+import { produkteLaden, kategorieLink, type Produkt } from '../../lib/inhalte';
+import { texte } from '../../lib/texte';
+
+/**
+ * Produktseite: Bildergalerie, Name, Preis, Beschreibung, Mengenwahl,
+ * Button „Zur Anfrageliste hinzufügen“, Verfügbarkeitsanzeige.
+ *
+ * Die Galerie kommt ohne JavaScript aus: Die Bilder liegen nebeneinander in
+ * einem Streifen mit Scroll-Einrastung, die Vorschaubilder sind Sprungmarken
+ * darauf. Auf dem Handy lässt sich zusätzlich mit dem Finger wischen.
+ *
+ * Mengenwahl und Button tragen bereits die Daten-Attribute, die das Skript der
+ * Anfrageliste in Phase 3 ausliest. Bis dahin sind sie noch ohne Funktion.
+ */
+export async function getStaticPaths() {
+  const produkte = await produkteLaden();
+  return produkte.map((produkt) => ({
+    params: { produkt: produkt.slug },
+    props: { produkt },
+  }));
+}
+
+interface Props {
+  produkt: Produkt;
+}
+
+const { produkt } = Astro.props;
+const { Content } = await render(produkt.eintrag);
+const hatBeschreibung = (produkt.eintrag.body ?? '').trim().length > 0;
+const mehrereBilder = produkt.bilder.length > 1;
+---
+
+<Grundlayout titel={produkt.name} beschreibung={produkt.kurzbeschreibung}>
+  <div class="huelle produkt">
+    <nav class="brotkrume" aria-label="Sie befinden sich hier">
+      <a href={kategorieLink(produkt.kategorie)}>{produkt.kategorie.name}</a>
+    </nav>
+
+    <div class="produkt__raster">
+      <section class="galerie" aria-label={texte.produkt.galerie}>
+        <div class="galerie__streifen">
+          {produkt.bilder.map((bild, index) => (
+            <figure class="galerie__bild" id={`bild-${index + 1}`}>
+              <Image
+                src={bild.quelle}
+                alt={bild.alt}
+                widths={[480, 720, 1080]}
+                sizes="(min-width: 60rem) 32rem, 94vw"
+                loading={index === 0 ? 'eager' : 'lazy'}
+              />
+            </figure>
+          ))}
+        </div>
+
+        {mehrereBilder && (
+          <ol class="galerie__vorschau">
+            {produkt.bilder.map((bild, index) => (
+              <li>
+                <a href={`#bild-${index + 1}`} aria-label={texte.produkt.bildWaehlen(index + 1, produkt.bilder.length)}>
+                  <Image src={bild.quelle} alt="" widths={[80, 160]} sizes="4.5rem" loading="lazy" />
+                </a>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+
+      <div class="angaben">
+        <h1>{produkt.name}</h1>
+        <p class="angaben__kurz">{produkt.kurzbeschreibung}</p>
+
+        <Preisangabe
+          preisCent={produkt.preisCent}
+          einheit={produkt.einheit}
+          grundpreis={produkt.grundpreis}
+          gross
+        />
+
+        {produkt.verfuegbar ? (
+          <form
+            class="bestellen"
+            data-produkt-formular
+            data-produkt-slug={produkt.slug}
+            data-produkt-name={produkt.name}
+            data-produkt-preis={produkt.preisCent}
+            data-produkt-einheit={produkt.einheit ?? ''}
+          >
+            <div class="bestellen__menge">
+              <label for="menge">{texte.produkt.menge}</label>
+              <input id="menge" name="menge" type="number" min="1" max="99" step="1" value="1" inputmode="numeric" />
+            </div>
+            <button type="submit" class="knopf">{texte.produkt.zurAnfrageliste}</button>
+          </form>
+        ) : (
+          <p class="vergriffen">{texte.produkt.nichtBestellbar}</p>
+        )}
+
+        {hatBeschreibung ? (
+          <div class="beschreibung">
+            <Content />
+          </div>
+        ) : (
+          <p class="beschreibung beschreibung--leer">{texte.produkt.keineBeschreibung}</p>
+        )}
+
+        <p class="angaben__zurueck">
+          <a href={kategorieLink(produkt.kategorie)}>
+            {texte.produkt.weitereProdukte(produkt.kategorie.name)}
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</Grundlayout>
+
+<style>
+  .produkt {
+    padding-block: 1.5rem 2rem;
+  }
+
+  .brotkrume {
+    margin-bottom: 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .produkt__raster {
+    display: grid;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  @media (min-width: 60rem) {
+    .produkt__raster {
+      grid-template-columns: minmax(0, 32rem) 1fr;
+      gap: 3rem;
+    }
+  }
+
+  /* --- Galerie ---------------------------------------------------------- */
+
+  .galerie__streifen {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    border-radius: var(--radius);
+    background: var(--farbe-flaeche-leise);
+    /* Die Bildleiste soll keinen dauerhaften Balken zeigen. */
+    scrollbar-width: thin;
+  }
+
+  .galerie__bild {
+    margin: 0;
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+  }
+
+  .galerie__bild :global(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .galerie__vorschau {
+    list-style: none;
+    display: flex;
+    gap: 0.6rem;
+    margin: 0.7rem 0 0;
+    padding: 0;
+    flex-wrap: wrap;
+  }
+
+  .galerie__vorschau a {
+    display: block;
+    border: 2px solid var(--farbe-linie);
+    border-radius: 0.4rem;
+    overflow: hidden;
+    line-height: 0;
+  }
+
+  .galerie__vorschau a:hover {
+    border-color: var(--farbe-primaer);
+  }
+
+  .galerie__vorschau :global(img) {
+    width: 4.5rem;
+    height: 3.4rem;
+    object-fit: cover;
+  }
+
+  /* --- Angaben ---------------------------------------------------------- */
+
+  .angaben h1 {
+    margin-bottom: 0.35rem;
+  }
+
+  .angaben__kurz {
+    font-size: 1.05rem;
+    color: var(--farbe-text-leise);
+    margin-bottom: 1.1rem;
+  }
+
+  .bestellen {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+    padding: 1.1rem;
+    background: var(--farbe-flaeche-leise);
+    border-radius: var(--radius);
+  }
+
+  .bestellen__menge {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .bestellen__menge label {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .bestellen__menge input {
+    width: 5rem;
+    padding: 0.6rem 0.65rem;
+    font: inherit;
+    border: 1px solid var(--farbe-linie);
+    border-radius: var(--radius);
+    background: var(--farbe-flaeche);
+    color: inherit;
+  }
+
+  .knopf {
+    flex: 1;
+    min-width: 14rem;
+    padding: 0.75rem 1.2rem;
+    font: inherit;
+    font-weight: 600;
+    color: var(--farbe-auf-primaer);
+    background: var(--farbe-primaer);
+    border: 1px solid var(--farbe-primaer);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+
+  .knopf:hover {
+    background: var(--farbe-primaer-dunkel);
+    border-color: var(--farbe-primaer-dunkel);
+  }
+
+  .vergriffen {
+    margin: 1.5rem 0;
+    padding: 0.9rem 1.1rem;
+    border-left: 4px solid var(--farbe-warnung);
+    background: var(--farbe-flaeche-leise);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-weight: 600;
+    color: var(--farbe-warnung);
+  }
+
+  .beschreibung {
+    margin-top: 1.75rem;
+    max-width: 38rem;
+  }
+
+  .beschreibung--leer {
+    color: var(--farbe-text-leise);
+  }
+
+  .beschreibung :global(blockquote) {
+    margin: 1.25rem 0;
+    padding: 0.8rem 1rem;
+    border-left: 4px solid var(--farbe-akzent);
+    background: var(--farbe-akzent-hell);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  .beschreibung :global(blockquote p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .angaben__zurueck {
+    margin-top: 2rem;
+    font-size: 0.95rem;
+  }
+</style>

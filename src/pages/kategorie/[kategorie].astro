@@ -1,0 +1,91 @@
+---
+import { Image } from 'astro:assets';
+import Grundlayout from '../../layouts/Grundlayout.astro';
+import Produktraster from '../../components/Produktraster.astro';
+import { kategorienLaden, produkteDerKategorie, type Kategorie, type Produkt } from '../../lib/inhalte';
+import { texte } from '../../lib/texte';
+
+/**
+ * Kategorieseite: Einleitung und Produktraster, sortiert nach Reihenfolge.
+ *
+ * Es entstehen nur Seiten für sichtbare Kategorien. Eine auf „nicht sichtbar“
+ * gestellte Kategorie verschwindet damit vollständig von der Website.
+ */
+export async function getStaticPaths() {
+  const kategorien = await kategorienLaden();
+
+  return Promise.all(
+    kategorien.map(async (kategorie) => ({
+      params: { kategorie: kategorie.slug },
+      props: {
+        kategorie,
+        produkte: await produkteDerKategorie(kategorie.slug),
+      },
+    }))
+  );
+}
+
+interface Props {
+  kategorie: Kategorie;
+  produkte: Produkt[];
+}
+
+const { kategorie, produkte } = Astro.props;
+---
+
+<Grundlayout
+  titel={kategorie.name}
+  beschreibung={kategorie.beschreibung ?? `${kategorie.name} im Angebot`}
+>
+  <div class="huelle kopfzeile">
+    {kategorie.bild && (
+      <Image
+        src={kategorie.bild}
+        alt={kategorie.bildAlt}
+        widths={[640, 960, 1400]}
+        sizes="(min-width: 60rem) 60rem, 100vw"
+        loading="eager"
+        class="kopfzeile__bild"
+      />
+    )}
+    <h1>{kategorie.name}</h1>
+    {kategorie.beschreibung && <p class="kopfzeile__text">{kategorie.beschreibung}</p>}
+  </div>
+
+  <section class="huelle abschnitt">
+    {produkte.length > 0 ? (
+      <Produktraster produkte={produkte} mitKategorie={false} />
+    ) : (
+      <p class="leer">{texte.kategorie.leer}</p>
+    )}
+  </section>
+</Grundlayout>
+
+<style>
+  .kopfzeile {
+    padding-block: 2rem 0.5rem;
+  }
+
+  .kopfzeile__bild {
+    width: 100%;
+    max-height: 18rem;
+    object-fit: cover;
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+  }
+
+  .kopfzeile__text {
+    max-width: 42rem;
+    font-size: 1.05rem;
+    color: var(--farbe-text-leise);
+  }
+
+  .abschnitt {
+    padding-block: 1.5rem;
+  }
+
+  .leer {
+    padding: 2rem 0;
+    color: var(--farbe-text-leise);
+  }
+</style>

@@ -1,0 +1,85 @@
+---
+import Grundlayout from '../layouts/Grundlayout.astro';
+import { einstellungen } from '../lib/einstellungen';
+import { texte } from '../lib/texte';
+
+/**
+ * Anfrageliste – Gerüst aus Phase 2.
+ *
+ * Die Seite bringt schon alle Texte mit, die aus den Einstellungen kommen:
+ * Bestellablauf und Versandangaben. Das Sammeln der Artikel, der
+ * Nachrichtentext und die Messenger-Buttons folgen in Phase 3.
+ */
+const { versand, bestellablauf } = einstellungen;
+---
+
+<Grundlayout titel={texte.anfrageliste.ueberschrift}>
+  <div class="huelle seite">
+    <h1>{texte.anfrageliste.ueberschrift}</h1>
+
+    <div class="liste" data-anfrageliste>
+      <p class="leer">{texte.anfrageliste.leer}</p>
+      <p><a href="/">{texte.anfrageliste.weiterStoebern}</a></p>
+    </div>
+
+    <p class="baustelle">{texte.anfrageliste.inArbeit}</p>
+
+    {bestellablauf && (
+      <section class="kasten">
+        <h2>{texte.anfrageliste.bestellablaufUeberschrift}</h2>
+        {bestellablauf.split('\n').map((zeile: string) => <p>{zeile}</p>)}
+      </section>
+    )}
+
+    {versand && (
+      <section class="kasten">
+        <h2>{texte.anfrageliste.versandUeberschrift}</h2>
+        {versand.split('\n').map((zeile: string) => <p>{zeile}</p>)}
+      </section>
+    )}
+
+    <p class="hinweis">{texte.anfrageliste.keinVertrag}</p>
+    <p class="hinweis">{texte.anfrageliste.datenschutzHinweis}</p>
+  </div>
+</Grundlayout>
+
+<style>
+  .seite {
+    max-width: 46rem;
+    padding-block: 2rem 1rem;
+  }
+
+  .leer {
+    color: var(--farbe-text-leise);
+  }
+
+  .baustelle {
+    padding: 0.85rem 1rem;
+    border: 1px dashed var(--farbe-linie);
+    border-radius: var(--radius);
+    color: var(--farbe-text-leise);
+    font-size: 0.92rem;
+  }
+
+  .kasten {
+    margin-top: 1.75rem;
+    padding: 1.1rem 1.25rem;
+    background: var(--farbe-flaeche-leise);
+    border-radius: var(--radius);
+  }
+
+  .kasten h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .kasten p:last-child {
+    margin-bottom: 0;
+  }
+
+  .hinweis {
+    margin-top: 1.25rem;
+    font-size: 0.9rem;
+    color: var(--farbe-text-leise);
+  }
+</style>
