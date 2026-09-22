@@ -2,72 +2,176 @@
 /**
  * Hintergrund „Sticker-Collage“.
  *
- * Eine Fläche aus überlappenden Aufklebern, wie man sie auf Skateboards oder
- * Laternenmasten sieht. Anders als die anderen drei Hintergründe ist dieser
- * laut – er passt zu Streetwear, Plattenladen, Tattoostudio oder Skateshop,
- * nicht zu jedem Betrieb.
+ * Eine dicht überklebte Fläche, wie eine Heckscheibe oder ein Laternenmast.
+ * Laut und bunt – passt zu Streetwear, Plattenladen, Tattoostudio oder
+ * Skateshop, nicht zu jedem Betrieb. Deshalb eine Option, keine Vorgabe.
  *
- * Drei Dinge halten ihn im Rahmen der Vorlage:
+ * Vier Dinge halten sie im Rahmen der Vorlage:
  *
  * 1. Reines SVG im Dokument – kein Bild, keine zusätzliche Anfrage.
- * 2. Die Farben leiten sich aus Primär- und Akzentfarbe ab. Weil zwei Farben
- *    für eine Collage zu wenig sind, werden daraus über den Farbkreis weitere
- *    erzeugt (siehe unten). Der Kunde stellt also nichts Zusätzliches ein.
- * 3. Die Ebene liegt hinter allem und ist heruntergedimmt. Karten und Kästen
- *    sind deckend, der Text steht also nie direkt auf dem Muster.
+ * 2. Die Formen sind eigene, abstrakte Aufkleber: Sterne, Blitze, Flammen,
+ *    Wimpel, Würfel, Pfeile, Tropfen, Augen. Bewusst KEINE Marken, Logos oder
+ *    Schriftzüge. Eine Vorlage, die an Kunden übergeben wird, darf keine
+ *    fremden Zeichen mitliefern – das wäre deren Abmahnrisiko, nicht unseres.
+ * 3. Die Farben entstehen aus Primär- und Akzentfarbe, über den Farbkreis
+ *    gedreht und in der Sättigung angehoben. Der Kunde stellt nichts
+ *    Zusätzliches ein, und die Collage passt trotzdem zu seinem Shop.
+ * 4. Textblöcke liegen auf einer hellen Fläche (siehe global.css), damit die
+ *    Seite trotz des lauten Untergrunds lesbar bleibt.
  *
- * Die Formen sind bewusst abstrakt: Kreise, Sterne, Blitze, Sprechblasen.
- * Keine Marken, keine Schrift – eine Vorlage soll keine fremden Zeichen
- * mitliefern.
+ * Der typische Aufkleber-Look entsteht aus zwei Durchgängen: Erst werden alle
+ * Formen mit dickem weißem Strich gezeichnet – das ist der ausgestanzte Rand.
+ * Darüber kommen dieselben Formen farbig mit dünner dunkler Kontur.
+ *
+ * Die Aufkleber werden nicht von Hand gesetzt, sondern aus einem versetzten
+ * Raster mit festem Zufallsstartwert erzeugt. Das ergibt eine dichte, aber
+ * ungleichmäßige Belegung, die bei jedem Build gleich aussieht.
  */
 
-/** Ein Aufkleber: Form, Farbklasse, Verschiebung, Drehung. */
-type Sticker = { d?: string; kreis?: [number, number, number]; rechteck?: [number, number, number, number, number]; klasse: string; x: number; y: number; drehung: number };
+type Form =
+  | { art: 'pfad'; d: string }
+  | { art: 'kreis'; r: number }
+  | { art: 'rechteck'; b: number; h: number; r: number };
 
-const stern = 'M0,-30 L8,-10 L30,-10 L12,4 L19,26 L0,12 L-19,26 L-12,4 L-30,-10 L-8,-10 Z';
-const blitz = 'M18,-34 L-10,8 L6,8 L-8,44 L26,0 L8,0 Z';
-const blase = 'M0,0 h88 a14,14 0 0 1 14,14 v34 a14,14 0 0 1 -14,14 h-44 l-20,18 v-18 h-24 a14,14 0 0 1 -14,-14 v-34 a14,14 0 0 1 14,-14 z';
-const tropfen = 'M26,-30 C42,-6 52,8 52,22 A26,26 0 0 1 0,22 C0,8 10,-6 26,-30 Z';
-const wimpel = 'M-40,-16 h80 l-14,16 l14,16 h-80 z';
+type Aufkleber = { form: Form; klasse: string; x: number; y: number; drehung: number; skalierung?: number };
 
-// Dicht gepackt und überlappend – eine Collage lebt davon, dass kaum Fläche
-// frei bleibt. Die Kachel ist 280 × 280 und wird nahtlos wiederholt.
-const sticker: Sticker[] = [
-  { kreis: [0, 0, 40], klasse: 'f1', x: 44, y: 40, drehung: 0 },
-  { rechteck: [-52, -24, 104, 48, 10], klasse: 'f4', x: 158, y: 30, drehung: 15 },
-  { d: stern, klasse: 'f3', x: 250, y: 58, drehung: -14 },
-  { d: blase, klasse: 'f2', x: -14, y: 96, drehung: -6 },
-  { d: blitz, klasse: 'f6', x: 156, y: 104, drehung: 10 },
-  { kreis: [0, 0, 30], klasse: 'f5', x: 232, y: 132, drehung: 0 },
-  { d: wimpel, klasse: 'f1', x: 60, y: 168, drehung: -18 },
-  { d: tropfen, klasse: 'f3', x: 132, y: 176, drehung: 18 },
-  { rechteck: [-34, -30, 68, 60, 16], klasse: 'f6', x: 30, y: 240, drehung: -11 },
-  { d: stern, klasse: 'f2', x: 118, y: 252, drehung: 22 },
-  { rechteck: [-46, -18, 92, 36, 9], klasse: 'f5', x: 214, y: 228, drehung: -22 },
-  { kreis: [0, 0, 26], klasse: 'f4', x: 272, y: 196, drehung: 0 },
-  // Wiederholungen an den Rändern, damit die Kachel nahtlos greift.
-  { kreis: [0, 0, 40], klasse: 'f1', x: 324, y: 40, drehung: 0 },
-  { d: blase, klasse: 'f2', x: 266, y: 96, drehung: -6 },
-  { kreis: [0, 0, 26], klasse: 'f4', x: -8, y: 196, drehung: 0 },
+// --- Formenvorrat, alles selbst gezeichnet ---------------------------------
+const stern = 'M0,-32 L9,-11 L32,-11 L13,3 L20,27 L0,13 L-20,27 L-13,3 L-32,-11 L-9,-11 Z';
+const blitz = 'M16,-36 L-14,6 L2,6 L-10,42 L24,-2 L6,-2 Z';
+const flamme = 'M0,-40 C14,-20 24,-10 24,6 A24,24 0 0 1 -24,6 C-24,-8 -14,-14 -8,-26 C-6,-14 0,-10 2,-18 C4,-26 2,-32 0,-40 Z';
+const wimpel = 'M-44,-17 h88 l-15,17 l15,17 h-88 z';
+const blase = 'M-52,-26 h104 a15,15 0 0 1 15,15 v30 a15,15 0 0 1 -15,15 h-48 l-22,19 v-19 h-34 a15,15 0 0 1 -15,-15 v-30 a15,15 0 0 1 15,-15 z';
+const pfeil = 'M-34,-12 h44 v-14 l26,26 l-26,26 v-14 h-44 z';
+const tropfen = 'M0,-34 C16,-10 27,4 27,18 A27,27 0 0 1 -27,18 C-27,4 -16,-10 0,-34 Z';
+const strahlen = 'M0,-34 L7,-14 L26,-24 L16,-5 L36,0 L16,5 L26,24 L7,14 L0,34 L-7,14 L-26,24 L-16,5 L-36,0 L-16,-5 L-26,-24 L-7,-14 Z';
+const auge = 'M-32,0 C-18,-20 18,-20 32,0 C18,20 -18,20 -32,0 Z';
+const herz = 'M0,26 C-26,8 -32,-8 -22,-18 C-13,-27 -2,-22 0,-12 C2,-22 13,-27 22,-18 C32,-8 26,8 0,26 Z';
+
+const kreis = (r: number): Form => ({ art: 'kreis', r });
+const feld = (b: number, h: number, r: number): Form => ({ art: 'rechteck', b, h, r });
+const pfad = (d: string): Form => ({ art: 'pfad', d });
+
+const formen: Form[] = [
+  kreis(40), feld(110, 50, 10), pfad(stern), pfad(blase), pfad(blitz),
+  pfad(flamme), pfad(wimpel), pfad(auge), pfad(pfeil), feld(74, 68, 18),
+  pfad(strahlen), pfad(tropfen), kreis(30), pfad(herz), feld(62, 30, 8),
 ];
+
+const farben = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6'];
+
+/** Kantenlänge der Kachel. Sie wiederholt sich nahtlos. */
+const KACHEL = 300;
+
+/**
+ * Zufall mit festem Startwert.
+ *
+ * Die Aufkleber sollen verstreut wirken, aber bei jedem Build identisch
+ * herauskommen – sonst sähe die Seite nach jeder Veröffentlichung anders aus
+ * und niemand könnte eine Änderung im Muster von einem Fehler unterscheiden.
+ */
+function zufall(startwert: number): () => number {
+  let zustand = startwert;
+  return () => {
+    zustand = (zustand * 1664525 + 1013904223) % 4294967296;
+    return zustand / 4294967296;
+  };
+}
+
+/*
+ * Dichte Belegung: ein Raster von 5 × 5 Plätzen, jeder Aufkleber um bis zu
+ * einen halben Platz verschoben und gedreht. Dadurch überlappen sie einander
+ * und es bleibt kaum freie Fläche – genau das macht eine Collage aus.
+ */
+function aufkleberBauen(): Aufkleber[] {
+  const wuerfel = zufall(20260922);
+  const reihen = 5;
+  const schritt = KACHEL / reihen;
+  const gelegt: Aufkleber[] = [];
+  let zaehler = 0;
+
+  for (let zeile = 0; zeile < reihen; zeile++) {
+    for (let spalte = 0; spalte < reihen; spalte++) {
+      // Versetzte Reihen, damit kein sichtbares Gitter entsteht.
+      const versatz = zeile % 2 === 0 ? 0 : schritt / 2;
+
+      gelegt.push({
+        form: formen[zaehler % formen.length]!,
+        klasse: farben[(zaehler * 5 + zeile) % farben.length]!,
+        x: spalte * schritt + versatz + (wuerfel() - 0.5) * schritt * 0.7,
+        y: zeile * schritt + (wuerfel() - 0.5) * schritt * 0.7,
+        drehung: Math.round((wuerfel() - 0.5) * 70),
+        skalierung: 0.85 + wuerfel() * 0.5,
+      });
+
+      zaehler++;
+    }
+  }
+
+  return gelegt;
+}
+
+/**
+ * Sorgt für die nahtlose Fuge.
+ *
+ * Ein Aufkleber, der über den Rand der Kachel ragt, wird zusätzlich auf der
+ * gegenüberliegenden Seite gezeichnet. Ohne das wären die Kachelgrenzen als
+ * Raster sichtbar.
+ */
+function mitRandwiederholung(liste: Aufkleber[]): Aufkleber[] {
+  const UEBERSTAND = 80;
+  const alle: Aufkleber[] = [];
+
+  for (const a of liste) {
+    const xVersatz = a.x < UEBERSTAND ? [0, KACHEL] : a.x > KACHEL - UEBERSTAND ? [0, -KACHEL] : [0];
+    const yVersatz = a.y < UEBERSTAND ? [0, KACHEL] : a.y > KACHEL - UEBERSTAND ? [0, -KACHEL] : [0];
+
+    for (const dx of xVersatz) {
+      for (const dy of yVersatz) {
+        alle.push(dx === 0 && dy === 0 ? a : { ...a, x: a.x + dx, y: a.y + dy });
+      }
+    }
+  }
+
+  return alle;
+}
+
+const aufkleber = mitRandwiederholung(aufkleberBauen());
+
+function lage(a: Aufkleber): string {
+  const rund = (zahl: number) => Math.round(zahl * 10) / 10;
+  const skal = a.skalierung ? ` scale(${rund(a.skalierung)})` : '';
+  return `translate(${rund(a.x)} ${rund(a.y)}) rotate(${a.drehung})${skal}`;
+}
 ---
 
 <div class="stickermuster" aria-hidden="true">
   <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
     <defs>
-      <pattern id="sticker-kachel" width="280" height="280" patternUnits="userSpaceOnUse" patternTransform="rotate(-6)">
-        {/* Der weiße Rand macht aus einer Form einen ausgestanzten Aufkleber
-            und hält die überlappenden Stücke auseinander. */}
-        <g stroke="#ffffff" stroke-width="6" stroke-linejoin="round">
-          {sticker.map((s) => {
-            const lage = `translate(${s.x} ${s.y}) rotate(${s.drehung})`;
-            if (s.kreis) return <circle cx="0" cy="0" r={s.kreis[2]} class={s.klasse} transform={lage} />;
-            if (s.rechteck) {
-              const [x, y, breite, hoehe, radius] = s.rechteck;
-              return <rect x={x} y={y} width={breite} height={hoehe} rx={radius} class={s.klasse} transform={lage} />;
-            }
-            return <path d={s.d} class={s.klasse} transform={lage} />;
-          })}
+      <pattern id="sticker-kachel" width={KACHEL} height={KACHEL} patternUnits="userSpaceOnUse" patternTransform="rotate(-5)">
+        {/* Erster Durchgang: der weiße, ausgestanzte Rand. */}
+        <g fill="#ffffff" stroke="#ffffff" stroke-width="11" stroke-linejoin="round">
+          {aufkleber.map((a) =>
+            a.form.art === 'kreis' ? (
+              <circle cx="0" cy="0" r={a.form.r} transform={lage(a)} />
+            ) : a.form.art === 'rechteck' ? (
+              <rect x={-a.form.b / 2} y={-a.form.h / 2} width={a.form.b} height={a.form.h} rx={a.form.r} transform={lage(a)} />
+            ) : (
+              <path d={a.form.d} transform={lage(a)} />
+            )
+          )}
+        </g>
+
+        {/* Zweiter Durchgang: die Farbfläche mit dunkler Kontur. */}
+        <g stroke="#15130f" stroke-width="3.5" stroke-linejoin="round">
+          {aufkleber.map((a) =>
+            a.form.art === 'kreis' ? (
+              <circle cx="0" cy="0" r={a.form.r} class={a.klasse} transform={lage(a)} />
+            ) : a.form.art === 'rechteck' ? (
+              <rect x={-a.form.b / 2} y={-a.form.h / 2} width={a.form.b} height={a.form.h} rx={a.form.r} class={a.klasse} transform={lage(a)} />
+            ) : (
+              <path d={a.form.d} class={a.klasse} transform={lage(a)} />
+            )
+          )}
         </g>
       </pattern>
     </defs>
@@ -82,18 +186,17 @@ const sticker: Sticker[] = [
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    /* Heruntergedimmt, damit Überschriften und Fließtext, die direkt darüber
-       stehen, lesbar bleiben. Karten und Kästen sind ohnehin deckend. */
-    opacity: 0.38;
+    /* Kräftiger als die übrigen Hintergründe – das ist der Sinn der Sache.
+       Lesbar bleibt die Seite über die hellen Textflächen in global.css. */
+    opacity: 0.62;
   }
 
   /*
-   * Zwei Shopfarben ergeben keine Collage. Deshalb werden daraus weitere
-   * erzeugt, indem der Farbton auf dem Farbkreis gedreht wird – Helligkeit
-   * und Sättigung bleiben, sodass alles zum Shop passt.
-   *
-   * Zuerst stehen Rückfallwerte aus color-mix. Kann der Browser die relative
-   * Farbangabe, überschreibt der Block darunter sie mit den gedrehten Tönen.
+   * Zwei Shopfarben ergeben keine Collage. Daraus werden vier weitere erzeugt,
+   * indem der Farbton auf dem Farbkreis gedreht und die Sättigung angehoben
+   * wird. Zuerst stehen Rückfallwerte aus color-mix; kann der Browser die
+   * relative Farbangabe, überschreibt der Block darunter sie mit den
+   * kräftigeren Tönen.
    */
   .f1 { fill: var(--farbe-primaer); }
   .f2 { fill: var(--farbe-akzent); }
@@ -103,17 +206,19 @@ const sticker: Sticker[] = [
   .f6 { fill: color-mix(in oklab, var(--farbe-primaer) 70%, var(--farbe-akzent)); }
 
   @supports (color: oklch(from red l c h)) {
-    .f3 { fill: oklch(from var(--farbe-primaer) clamp(0.55, l, 0.8) max(c, 0.12) calc(h + 45)); }
-    .f4 { fill: oklch(from var(--farbe-akzent) clamp(0.6, l, 0.85) max(c, 0.11) calc(h - 55)); }
-    .f5 { fill: oklch(from var(--farbe-primaer) clamp(0.62, l, 0.86) max(c, 0.1) calc(h + 130)); }
-    .f6 { fill: oklch(from var(--farbe-akzent) clamp(0.55, l, 0.8) max(c, 0.13) calc(h + 75)); }
+    .f1 { fill: oklch(from var(--farbe-primaer) clamp(0.5, l, 0.72) max(c, 0.17) h); }
+    .f2 { fill: oklch(from var(--farbe-akzent) clamp(0.5, l, 0.72) max(c, 0.17) h); }
+    .f3 { fill: oklch(from var(--farbe-primaer) 0.68 0.19 calc(h + 50)); }
+    .f4 { fill: oklch(from var(--farbe-akzent) 0.75 0.18 calc(h - 60)); }
+    .f5 { fill: oklch(from var(--farbe-primaer) 0.82 0.17 calc(h + 135)); }
+    .f6 { fill: oklch(from var(--farbe-akzent) 0.6 0.2 calc(h + 85)); }
   }
 
   /* „Weniger Bewegung“ heißt auch: weniger Unruhe. Die Collage steht still,
      flimmert aber – das zurückzunehmen kostet nichts. */
   @media (prefers-reduced-motion: reduce) {
     .stickermuster {
-      opacity: 0.2;
+      opacity: 0.3;
     }
   }
 </style>

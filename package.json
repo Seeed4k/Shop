@@ -12,8 +12,14 @@
     "test": "esbuild src/scripts/nachricht.ts --bundle --format=esm --outfile=.test-build/nachricht.mjs --log-level=warning && node --test tests/*.test.mjs"
   },
   "dependencies": {
+    "@astrojs/netlify": "^8.2.6",
+    "@astrojs/react": "^6.0.6",
+    "@keystatic/astro": "^6.0.0",
+    "@keystatic/core": "^0.6.9",
     "astro": "^7.3.3",
     "qrcode-generator": "^2.0.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "zod": "^4.6.5"
   },
   "devDependencies": {
