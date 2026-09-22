@@ -1,0 +1,165 @@
+---
+import { Image } from 'astro:assets';
+import Grundlayout from '../layouts/Grundlayout.astro';
+import { einstellungen } from '../lib/einstellungen';
+import { kategorienLaden, produkteLaden, kategorieLink, produktLink } from '../lib/inhalte';
+import { preisFormatieren, umsatzsteuerHinweis } from '../lib/preis';
+import { texte } from '../lib/texte';
+
+/**
+ * Startseite – vorläufige Fassung aus Phase 1.
+ *
+ * Sie zeigt, dass Einstellungen, Kategorien und Produkte geladen werden. Die
+ * ausgearbeitete Gestaltung mit Kategorie-Kacheln und Empfehlungen folgt in
+ * Phase 2.
+ */
+const kategorien = await kategorienLaden();
+const produkte = await produkteLaden();
+const { shop } = einstellungen;
+const steuerhinweis = umsatzsteuerHinweis(einstellungen);
+---
+
+<Grundlayout
+  titel={shop.name}
+  beschreibung={shop.startseiteText.slice(0, 160)}
+  titelAlleinstehend
+>
+  <section class="huelle willkommen">
+    <h1>{shop.startseiteUeberschrift || shop.name}</h1>
+    {shop.startseiteText && <p class="willkommen__text">{shop.startseiteText}</p>}
+  </section>
+
+  <section class="huelle">
+    <h2>{texte.startseite.kategorienUeberschrift}</h2>
+    <ul class="kacheln">
+      {kategorien.map((kategorie) => (
+        <li class="kachel">
+          <a href={kategorieLink(kategorie)}>
+            {kategorie.bild && (
+              <Image src={kategorie.bild} alt={kategorie.bildAlt} width={600} height={450} class="kachel__bild" />
+            )}
+            <span class="kachel__name">{kategorie.name}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="huelle">
+    <h2>Alle Produkte</h2>
+    <p class="hinweis">
+      Vorläufige Übersicht aus Phase 1. Die Kategorie- und Produktseiten entstehen in Phase 2.
+    </p>
+    <ul class="kacheln">
+      {produkte.map((produkt) => (
+        <li class="kachel">
+          <a href={produktLink(produkt)}>
+            <Image
+              src={produkt.hauptbild.quelle}
+              alt={produkt.hauptbild.alt}
+              width={600}
+              height={450}
+              class="kachel__bild"
+            />
+            <span class="kachel__name">{produkt.name}</span>
+            <span class="kachel__kategorie">{produkt.kategorie.name}</span>
+            <span class="kachel__preis">
+              {preisFormatieren(produkt.preisCent)}
+              {produkt.einheit && <span class="kachel__einheit"> / {produkt.einheit}</span>}
+            </span>
+            <span class="kachel__steuer">{steuerhinweis}</span>
+            {produkt.grundpreis && <span class="kachel__steuer">{texte.produkt.grundpreis}: {produkt.grundpreis}</span>}
+            {!produkt.verfuegbar && <span class="kachel__nicht-verfuegbar">{texte.produkt.nichtVerfuegbar}</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Grundlayout>
+
+<style>
+  .willkommen {
+    padding-block: 2.5rem 1rem;
+  }
+
+  .willkommen__text {
+    max-width: 44rem;
+    font-size: 1.1rem;
+    color: var(--farbe-text-leise);
+  }
+
+  .hinweis {
+    color: var(--farbe-text-leise);
+    font-size: 0.95rem;
+  }
+
+  .kacheln {
+    list-style: none;
+    margin: 0 0 2.5rem;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  }
+
+  .kachel a {
+    display: grid;
+    gap: 0.2rem;
+    height: 100%;
+    padding-bottom: 0.9rem;
+    border: 1px solid var(--farbe-linie);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--farbe-flaeche);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .kachel a:hover {
+    box-shadow: var(--schatten);
+    border-color: var(--farbe-primaer);
+  }
+
+  .kachel__bild {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    margin-bottom: 0.6rem;
+  }
+
+  .kachel__name,
+  .kachel__kategorie,
+  .kachel__preis,
+  .kachel__steuer,
+  .kachel__nicht-verfuegbar {
+    padding-inline: 0.9rem;
+  }
+
+  .kachel__name {
+    font-weight: 650;
+  }
+
+  .kachel__kategorie,
+  .kachel__steuer {
+    font-size: 0.85rem;
+    color: var(--farbe-text-leise);
+  }
+
+  .kachel__preis {
+    margin-top: 0.3rem;
+    font-weight: 650;
+    color: var(--farbe-primaer-dunkel);
+  }
+
+  .kachel__einheit {
+    font-weight: 400;
+    color: var(--farbe-text-leise);
+  }
+
+  .kachel__nicht-verfuegbar {
+    margin-top: 0.35rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--farbe-warnung);
+  }
+</style>

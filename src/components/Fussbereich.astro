@@ -1,0 +1,110 @@
+---
+import { einstellungen } from '../lib/einstellungen';
+import { rechtstexteLaden, rechtstextLink } from '../lib/inhalte';
+import { texte } from '../lib/texte';
+
+/**
+ * Fußbereich mit Kontakt und den Rechtsseiten.
+ *
+ * Verlinkt werden nur Rechtstexte, die auch befüllt sind – die AGB sind laut
+ * Briefing optional. Ein Link auf eine leere Seite wäre schlimmer als gar
+ * keiner.
+ */
+const rechtstexte = await rechtstexteLaden();
+const { kontakt, shop } = einstellungen;
+const jahr = new Date().getFullYear();
+---
+
+<footer class="fuss">
+  <div class="huelle fuss__inhalt">
+    <section class="fuss__spalte">
+      <h2>{texte.fussbereich.kontakt}</h2>
+      <address>
+        {kontakt.inhaber && <div class="fuss__inhaber">{kontakt.inhaber}</div>}
+        {kontakt.adresse && (
+          <div>
+            {kontakt.adresse.split('\n').map((zeile: string) => <div>{zeile}</div>)}
+          </div>
+        )}
+        {kontakt.telefon && (
+          <div>
+            Telefon: <a href={`tel:${kontakt.telefon.replace(/[^\d+]/g, '')}`}>{kontakt.telefon}</a>
+          </div>
+        )}
+        {kontakt.email && (
+          <div>
+            E-Mail: <a href={`mailto:${kontakt.email}`}>{kontakt.email}</a>
+          </div>
+        )}
+      </address>
+    </section>
+
+    {rechtstexte.length > 0 && (
+      <nav class="fuss__spalte" aria-label={texte.fussbereich.rechtliches}>
+        <h2>{texte.fussbereich.rechtliches}</h2>
+        <ul>
+          {rechtstexte.map((rechtstext) => (
+            <li><a href={rechtstextLink(rechtstext)}>{rechtstext.titel}</a></li>
+          ))}
+        </ul>
+      </nav>
+    )}
+  </div>
+
+  <div class="huelle fuss__zeile">
+    <small>© {jahr} {shop.name}</small>
+  </div>
+</footer>
+
+<style>
+  .fuss {
+    margin-top: 3.5rem;
+    background: var(--farbe-flaeche-leise);
+    border-top: 1px solid var(--farbe-linie);
+    padding-block: 2.25rem 1.25rem;
+    color: var(--farbe-text-leise);
+    font-size: 0.95rem;
+  }
+
+  .fuss__inhalt {
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (min-width: 40rem) {
+    .fuss__inhalt {
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    }
+  }
+
+  .fuss h2 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--farbe-text);
+    margin-bottom: 0.75rem;
+  }
+
+  .fuss address {
+    font-style: normal;
+    line-height: 1.7;
+  }
+
+  .fuss__inhaber {
+    font-weight: 600;
+    color: var(--farbe-text);
+  }
+
+  .fuss ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    line-height: 1.9;
+  }
+
+  .fuss__zeile {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--farbe-linie);
+  }
+</style>

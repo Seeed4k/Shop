@@ -1,0 +1,8 @@
+{
+  "name": "Eingemachtes",
+  "beschreibung": "Marmeladen, Gelees und Eingelegtes aus dem, was Garten und Streuobstwiese hergeben.",
+  "bild": "/src/bilder/kategorie-eingemachtes.jpg",
+  "bildAlt": "Eingeweckte Gläser mit Marmelade auf einem Regal",
+  "reihenfolge": 3,
+  "sichtbar": true
+}

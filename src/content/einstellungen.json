@@ -1,0 +1,40 @@
+{
+  "shop": {
+    "name": "Hofladen Sonnenacker",
+    "website": "https://hofladen-sonnenacker.example",
+    "logo": "/src/bilder/logo.png",
+    "logoAlt": "Logo des Hofladens Sonnenacker",
+    "favicon": "/src/bilder/favicon.png",
+    "primaerfarbe": "#7a4b2a",
+    "akzentfarbe": "#3f7d4f",
+    "startseiteUeberschrift": "Frisch vom Hof, direkt zu Ihnen",
+    "startseiteText": "Wir backen jeden Morgen, machen unseren Käse selbst und füllen ein, was der Garten hergibt. Suchen Sie sich zusammen, was Sie mögen, und schicken Sie uns Ihre Anfrage per Messenger.",
+    "startseiteBild": "/src/bilder/startseite.jpg",
+    "startseiteBildAlt": "Blick über die Felder des Hofes am Morgen"
+  },
+  "kontakt": {
+    "inhaber": "Anna und Martin Feldmann GbR",
+    "adresse": "Sonnenackerweg 12\n01234 Musterdorf",
+    "email": "hallo@hofladen-sonnenacker.example",
+    "telefon": "01234 567890"
+  },
+  "messenger": {
+    "telegram": {
+      "aktiv": true,
+      "benutzername": "hofladen_sonnenacker"
+    },
+    "threema": {
+      "aktiv": true,
+      "id": "SONNACK7"
+    },
+    "signal": {
+      "aktiv": true,
+      "telefon": "+4915112345678"
+    }
+  },
+  "preise": {
+    "umsatzsteuerModus": "kleinunternehmer"
+  },
+  "versand": "Abholung am Hof ist jederzeit nach Absprache möglich und kostenlos.\nVersand innerhalb Deutschlands: 5,90 € pauschal, ab 50 € Bestellwert versandkostenfrei.\nWir versenden dienstags und donnerstags. Frische Ware geht nur dienstags raus.",
+  "bestellablauf": "So geht es weiter: Sie schicken uns Ihre Anfrage über einen der Messenger. Wir melden uns in der Regel innerhalb eines Werktags mit einer Bestätigung und dem Gesamtbetrag inklusive Versand. Erst damit ist Ihre Bestellung verbindlich. Bezahlt wird per Überweisung oder bar bei der Abholung."
+}

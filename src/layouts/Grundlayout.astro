@@ -1,0 +1,79 @@
+---
+import { getImage } from 'astro:assets';
+import { einstellungen } from '../lib/einstellungen';
+import { bildFinden } from '../lib/bilder';
+import { schriftAuf } from '../lib/farben';
+import Kopfbereich from '../components/Kopfbereich.astro';
+import Fussbereich from '../components/Fussbereich.astro';
+import '../styles/global.css';
+
+/**
+ * Das Grundlayout jeder Seite.
+ *
+ * Hier werden die Farben aus den Einstellungen als CSS-Variablen gesetzt.
+ * Dadurch wirkt ein Farbwechsel im Panel sofort auf der ganzen Website, ohne
+ * dass irgendwo CSS angefasst werden muss. Die Schriftfarbe auf den
+ * Kundenfarben wird berechnet, damit sie auch bei einer hellen Primärfarbe
+ * lesbar bleibt.
+ */
+interface Props {
+  titel: string;
+  beschreibung?: string;
+  /** Vollständige URL eines Vorschaubildes zum Teilen. */
+  vorschaubild?: string;
+  /** Der Seitentitel wird um den Shopnamen ergänzt – außer auf der Startseite. */
+  titelAlleinstehend?: boolean;
+}
+
+const { titel, beschreibung, vorschaubild, titelAlleinstehend = false } = Astro.props;
+
+const seitentitel = titelAlleinstehend ? titel : `${titel} – ${einstellungen.shop.name}`;
+
+const favicon = bildFinden(einstellungen.shop.favicon, 'Favicon in den Einstellungen');
+const faviconUrl = favicon ? (await getImage({ src: favicon, width: 180, height: 180, format: 'png' })).src : undefined;
+
+const primaer = einstellungen.shop.primaerfarbe;
+const akzent = einstellungen.shop.akzentfarbe;
+
+// Astro.site ist nur gesetzt, wenn in den Einstellungen eine Adresse steht.
+const kanonisch = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{seitentitel}</title>
+    {beschreibung && <meta name="description" content={beschreibung} />}
+    {kanonisch && <link rel="canonical" href={kanonisch} />}
+    {faviconUrl && <link rel="icon" href={faviconUrl} />}
+    {faviconUrl && <link rel="apple-touch-icon" href={faviconUrl} />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={seitentitel} />
+    <meta property="og:site_name" content={einstellungen.shop.name} />
+    {beschreibung && <meta property="og:description" content={beschreibung} />}
+    {kanonisch && <meta property="og:url" content={kanonisch} />}
+    {vorschaubild && <meta property="og:image" content={vorschaubild} />}
+
+    <meta name="generator" content={Astro.generator} />
+
+    <!--
+      Die Farben kommen aus den Einstellungen und stehen deshalb inline im
+      Dokument – eine eigene CSS-Datei dafür wäre eine zusätzliche Anfrage
+      für vier Werte.
+    -->
+    <style is:inline set:html={`:root{--farbe-primaer:${primaer};--farbe-akzent:${akzent};--farbe-auf-primaer:${schriftAuf(primaer)};--farbe-auf-akzent:${schriftAuf(akzent)};}`}></style>
+    <meta name="theme-color" content={primaer} />
+  </head>
+
+  <body>
+    <a class="sprungmarke" href="#inhalt">Zum Inhalt springen</a>
+    <Kopfbereich />
+    <main id="inhalt" tabindex="-1">
+      <slot />
+    </main>
+    <Fussbereich />
+  </body>
+</html>

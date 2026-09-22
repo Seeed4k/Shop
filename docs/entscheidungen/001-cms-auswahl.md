@@ -1,6 +1,6 @@
 # 001 – CMS-Auswahl für die Messenger-Shop-Vorlage
 
-**Status:** Empfehlung, Entscheidung ausstehend
+**Status:** Angenommen (Freigabe am 2026-09-22)
 **Datum:** 2026-09-22
 **Betrifft:** Redaktionssystem, mit dem der Kunde nach der Übergabe alle Inhalte pflegt
 

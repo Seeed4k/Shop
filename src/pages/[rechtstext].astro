@@ -1,0 +1,56 @@
+---
+import { render } from 'astro:content';
+import Grundlayout from '../layouts/Grundlayout.astro';
+import { rechtstexteLaden } from '../lib/inhalte';
+
+/**
+ * Die Rechtsseiten (Impressum, Datenschutz, Widerruf, AGB, Versand & Zahlung).
+ *
+ * Es entstehen nur Seiten für befüllte Texte. Ein leeres Feld im Panel führt
+ * also nicht zu einer leeren Seite, sondern zu gar keiner.
+ */
+export async function getStaticPaths() {
+  const rechtstexte = await rechtstexteLaden();
+  return rechtstexte.map((rechtstext) => ({
+    params: { rechtstext: rechtstext.slug },
+    props: { rechtstext },
+  }));
+}
+
+const { rechtstext } = Astro.props;
+const { Content } = await render(rechtstext.eintrag);
+---
+
+<Grundlayout titel={rechtstext.titel}>
+  <article class="huelle rechtstext">
+    <h1>{rechtstext.titel}</h1>
+    <Content />
+  </article>
+</Grundlayout>
+
+<style>
+  .rechtstext {
+    max-width: 46rem;
+    padding-block: 2.5rem;
+  }
+
+  .rechtstext :global(h2) {
+    margin-top: 2rem;
+  }
+
+  .rechtstext :global(blockquote) {
+    margin: 1.5rem 0;
+    padding: 0.9rem 1.1rem;
+    border-left: 4px solid var(--farbe-akzent);
+    background: var(--farbe-akzent-hell);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  .rechtstext :global(blockquote p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .rechtstext :global(ul) {
+    line-height: 1.8;
+  }
+</style>

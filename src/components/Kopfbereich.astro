@@ -1,0 +1,242 @@
+---
+import { Image } from 'astro:assets';
+import { einstellungen } from '../lib/einstellungen';
+import { kategorienLaden, kategorieLink } from '../lib/inhalte';
+import { bildFinden } from '../lib/bilder';
+import { texte } from '../lib/texte';
+
+/**
+ * Kopfbereich mit Logo, Kategorien und Anfrageliste.
+ *
+ * Das Menü nutzt <details>/<summary> und funktioniert damit vollständig ohne
+ * JavaScript – auch wenn Skripte blockiert sind. Das kurze Skript am Ende ist
+ * reine Zugabe: Es klappt die Kategorieliste auf breiten Bildschirmen dauerhaft
+ * auf, damit dort kein überflüssiger Schalter steht. Ohne das Skript bleibt der
+ * Schalter sichtbar und das Menü trotzdem bedienbar.
+ */
+const kategorien = await kategorienLaden();
+const logo = bildFinden(einstellungen.shop.logo, 'Logo in den Einstellungen');
+const aktuellerPfad = Astro.url.pathname;
+---
+
+<header class="kopf">
+  <div class="huelle kopf__inhalt">
+    <a class="kopf__marke" href="/" aria-label={texte.navigation.zurStartseite}>
+      {logo && (
+        <Image
+          src={logo}
+          alt={einstellungen.shop.logoAlt ?? ''}
+          width={48}
+          height={48}
+          loading="eager"
+          class="kopf__logo"
+        />
+      )}
+      <span class="kopf__name">{einstellungen.shop.name}</span>
+    </a>
+
+    <details class="menue">
+      <summary class="menue__schalter">
+        <span class="menue__schalter-text">{texte.navigation.kategorien}</span>
+        <svg class="menue__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </summary>
+
+      <nav class="menue__liste" aria-label={texte.navigation.kategorien}>
+        <ul>
+          {kategorien.map((kategorie) => {
+            const link = kategorieLink(kategorie);
+            const istAktuell = aktuellerPfad.startsWith(link);
+            return (
+              <li>
+                <a href={link} aria-current={istAktuell ? 'page' : undefined}>{kategorie.name}</a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </details>
+
+    <a class="kopf__anfrageliste" href="/anfrageliste/">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="22" height="22">
+        <path d="M6 7h12l-1 12H7L6 7Zm3 0a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+      </svg>
+      <span class="kopf__anfrageliste-text">{texte.navigation.anfrageliste}</span>
+      {/* Die Anzahl füllt das Skript der Anfrageliste in Phase 3. Bis dahin
+          bleibt der Platz leer statt bei 0 zu stehen. */}
+      <span class="kopf__anzahl" data-anfrageliste-anzahl hidden></span>
+    </a>
+  </div>
+</header>
+
+<style>
+  .kopf {
+    background: var(--farbe-primaer);
+    color: var(--farbe-auf-primaer);
+  }
+
+  .kopf__inhalt {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 4rem;
+    flex-wrap: wrap;
+  }
+
+  .kopf__marke {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: inherit;
+    text-decoration: none;
+    margin-right: auto;
+    padding-block: 0.5rem;
+  }
+
+  .kopf__logo {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  .kopf__name {
+    font-weight: 650;
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+  }
+
+  .menue__schalter {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .menue__schalter::-webkit-details-marker {
+    display: none;
+  }
+
+  .menue__schalter:hover {
+    background: rgb(255 255 255 / 0.14);
+  }
+
+  .menue__icon {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  .menue__liste ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .menue__liste a {
+    display: block;
+    padding: 0.6rem 0.7rem;
+    color: inherit;
+    text-decoration: none;
+    border-radius: var(--radius);
+  }
+
+  .menue__liste a:hover,
+  .menue__liste a[aria-current='page'] {
+    background: rgb(255 255 255 / 0.16);
+    text-decoration: underline;
+  }
+
+  .kopf__anfrageliste {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: var(--radius);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .kopf__anfrageliste:hover {
+    background: rgb(255 255 255 / 0.14);
+  }
+
+  .kopf__anzahl {
+    min-width: 1.5rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: var(--farbe-akzent);
+    color: var(--farbe-auf-akzent);
+    font-size: 0.85rem;
+    font-weight: 650;
+    text-align: center;
+  }
+
+  /* Auf dem Handy klappt die Kategorieliste unter den Kopf. */
+  .menue[open] .menue__liste {
+    order: 3;
+    flex-basis: 100%;
+    width: 100%;
+    padding-bottom: 0.75rem;
+  }
+
+  .menue {
+    order: 2;
+  }
+
+  .menue[open] {
+    flex-basis: 100%;
+  }
+
+  /* Ab Tablet steht die Kategorieliste offen im Kopf, der Schalter entfällt. */
+  @media (min-width: 48rem) {
+    .menue__schalter {
+      display: none;
+    }
+
+    .menue {
+      order: 0;
+      flex-basis: auto;
+      margin-right: 0.5rem;
+    }
+
+    .menue__liste ul {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .menue__liste {
+      padding-bottom: 0 !important;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .kopf__anfrageliste-text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+</style>
+
+<script is:inline>
+  // Ab Tablet ist die Kategorieliste immer sichtbar. <details> wird dafür
+  // dauerhaft geöffnet, damit der Inhalt auch ohne Klick im Zugriff ist.
+  (function () {
+    var menue = document.querySelector('.menue');
+    if (!menue) return;
+    var breit = window.matchMedia('(min-width: 48rem)');
+    function anpassen() {
+      if (breit.matches) menue.setAttribute('open', '');
+      else menue.removeAttribute('open');
+    }
+    anpassen();
+    breit.addEventListener('change', anpassen);
+  })();
+</script>
