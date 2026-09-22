@@ -11,7 +11,7 @@ bilder:
   - bild: /src/bilder/produkte/bauernbrot/bilder/1/bild.jpg
     alt: Bauernbrot von oben mit bemehlter Kruste
 verfuegbar: true
-hervorgehoben: true
+hervorgehoben: false
 reihenfolge: 1
 ---
 Unser Bauernbrot ist das, womit bei uns jeder Backtag anfängt. Roggen und Weizen aus
