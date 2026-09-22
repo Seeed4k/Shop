@@ -30,6 +30,11 @@ export const hintergruende = {
     label: 'Feines Punktmuster',
     beschreibung: 'Ein zurückhaltendes Punktraster in Ihrer Primärfarbe. Gibt der Fläche Struktur.',
   },
+  sticker: {
+    label: 'Sticker-Collage',
+    beschreibung:
+      'Eine Fläche aus überlappenden Aufklebern in Ihren Farben. Auffällig – passt zu Streetwear, Plattenladen oder Skateshop, weniger zu einem ruhigen Sortiment.',
+  },
 } as const satisfies Record<string, Hintergrund>;
 
 export type HintergrundId = keyof typeof hintergruende;

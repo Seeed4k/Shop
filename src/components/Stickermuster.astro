@@ -1,0 +1,119 @@
+---
+/**
+ * Hintergrund „Sticker-Collage“.
+ *
+ * Eine Fläche aus überlappenden Aufklebern, wie man sie auf Skateboards oder
+ * Laternenmasten sieht. Anders als die anderen drei Hintergründe ist dieser
+ * laut – er passt zu Streetwear, Plattenladen, Tattoostudio oder Skateshop,
+ * nicht zu jedem Betrieb.
+ *
+ * Drei Dinge halten ihn im Rahmen der Vorlage:
+ *
+ * 1. Reines SVG im Dokument – kein Bild, keine zusätzliche Anfrage.
+ * 2. Die Farben leiten sich aus Primär- und Akzentfarbe ab. Weil zwei Farben
+ *    für eine Collage zu wenig sind, werden daraus über den Farbkreis weitere
+ *    erzeugt (siehe unten). Der Kunde stellt also nichts Zusätzliches ein.
+ * 3. Die Ebene liegt hinter allem und ist heruntergedimmt. Karten und Kästen
+ *    sind deckend, der Text steht also nie direkt auf dem Muster.
+ *
+ * Die Formen sind bewusst abstrakt: Kreise, Sterne, Blitze, Sprechblasen.
+ * Keine Marken, keine Schrift – eine Vorlage soll keine fremden Zeichen
+ * mitliefern.
+ */
+
+/** Ein Aufkleber: Form, Farbklasse, Verschiebung, Drehung. */
+type Sticker = { d?: string; kreis?: [number, number, number]; rechteck?: [number, number, number, number, number]; klasse: string; x: number; y: number; drehung: number };
+
+const stern = 'M0,-30 L8,-10 L30,-10 L12,4 L19,26 L0,12 L-19,26 L-12,4 L-30,-10 L-8,-10 Z';
+const blitz = 'M18,-34 L-10,8 L6,8 L-8,44 L26,0 L8,0 Z';
+const blase = 'M0,0 h88 a14,14 0 0 1 14,14 v34 a14,14 0 0 1 -14,14 h-44 l-20,18 v-18 h-24 a14,14 0 0 1 -14,-14 v-34 a14,14 0 0 1 14,-14 z';
+const tropfen = 'M26,-30 C42,-6 52,8 52,22 A26,26 0 0 1 0,22 C0,8 10,-6 26,-30 Z';
+const wimpel = 'M-40,-16 h80 l-14,16 l14,16 h-80 z';
+
+// Dicht gepackt und überlappend – eine Collage lebt davon, dass kaum Fläche
+// frei bleibt. Die Kachel ist 280 × 280 und wird nahtlos wiederholt.
+const sticker: Sticker[] = [
+  { kreis: [0, 0, 40], klasse: 'f1', x: 44, y: 40, drehung: 0 },
+  { rechteck: [-52, -24, 104, 48, 10], klasse: 'f4', x: 158, y: 30, drehung: 15 },
+  { d: stern, klasse: 'f3', x: 250, y: 58, drehung: -14 },
+  { d: blase, klasse: 'f2', x: -14, y: 96, drehung: -6 },
+  { d: blitz, klasse: 'f6', x: 156, y: 104, drehung: 10 },
+  { kreis: [0, 0, 30], klasse: 'f5', x: 232, y: 132, drehung: 0 },
+  { d: wimpel, klasse: 'f1', x: 60, y: 168, drehung: -18 },
+  { d: tropfen, klasse: 'f3', x: 132, y: 176, drehung: 18 },
+  { rechteck: [-34, -30, 68, 60, 16], klasse: 'f6', x: 30, y: 240, drehung: -11 },
+  { d: stern, klasse: 'f2', x: 118, y: 252, drehung: 22 },
+  { rechteck: [-46, -18, 92, 36, 9], klasse: 'f5', x: 214, y: 228, drehung: -22 },
+  { kreis: [0, 0, 26], klasse: 'f4', x: 272, y: 196, drehung: 0 },
+  // Wiederholungen an den Rändern, damit die Kachel nahtlos greift.
+  { kreis: [0, 0, 40], klasse: 'f1', x: 324, y: 40, drehung: 0 },
+  { d: blase, klasse: 'f2', x: 266, y: 96, drehung: -6 },
+  { kreis: [0, 0, 26], klasse: 'f4', x: -8, y: 196, drehung: 0 },
+];
+---
+
+<div class="stickermuster" aria-hidden="true">
+  <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <pattern id="sticker-kachel" width="280" height="280" patternUnits="userSpaceOnUse" patternTransform="rotate(-6)">
+        {/* Der weiße Rand macht aus einer Form einen ausgestanzten Aufkleber
+            und hält die überlappenden Stücke auseinander. */}
+        <g stroke="#ffffff" stroke-width="6" stroke-linejoin="round">
+          {sticker.map((s) => {
+            const lage = `translate(${s.x} ${s.y}) rotate(${s.drehung})`;
+            if (s.kreis) return <circle cx="0" cy="0" r={s.kreis[2]} class={s.klasse} transform={lage} />;
+            if (s.rechteck) {
+              const [x, y, breite, hoehe, radius] = s.rechteck;
+              return <rect x={x} y={y} width={breite} height={hoehe} rx={radius} class={s.klasse} transform={lage} />;
+            }
+            return <path d={s.d} class={s.klasse} transform={lage} />;
+          })}
+        </g>
+      </pattern>
+    </defs>
+
+    <rect width="100%" height="100%" fill="url(#sticker-kachel)" />
+  </svg>
+</div>
+
+<style>
+  .stickermuster {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    /* Heruntergedimmt, damit Überschriften und Fließtext, die direkt darüber
+       stehen, lesbar bleiben. Karten und Kästen sind ohnehin deckend. */
+    opacity: 0.38;
+  }
+
+  /*
+   * Zwei Shopfarben ergeben keine Collage. Deshalb werden daraus weitere
+   * erzeugt, indem der Farbton auf dem Farbkreis gedreht wird – Helligkeit
+   * und Sättigung bleiben, sodass alles zum Shop passt.
+   *
+   * Zuerst stehen Rückfallwerte aus color-mix. Kann der Browser die relative
+   * Farbangabe, überschreibt der Block darunter sie mit den gedrehten Tönen.
+   */
+  .f1 { fill: var(--farbe-primaer); }
+  .f2 { fill: var(--farbe-akzent); }
+  .f3 { fill: color-mix(in oklab, var(--farbe-primaer) 55%, var(--farbe-akzent)); }
+  .f4 { fill: color-mix(in oklab, var(--farbe-akzent) 45%, #ffffff); }
+  .f5 { fill: color-mix(in oklab, var(--farbe-primaer) 40%, #ffffff); }
+  .f6 { fill: color-mix(in oklab, var(--farbe-primaer) 70%, var(--farbe-akzent)); }
+
+  @supports (color: oklch(from red l c h)) {
+    .f3 { fill: oklch(from var(--farbe-primaer) clamp(0.55, l, 0.8) max(c, 0.12) calc(h + 45)); }
+    .f4 { fill: oklch(from var(--farbe-akzent) clamp(0.6, l, 0.85) max(c, 0.11) calc(h - 55)); }
+    .f5 { fill: oklch(from var(--farbe-primaer) clamp(0.62, l, 0.86) max(c, 0.1) calc(h + 130)); }
+    .f6 { fill: oklch(from var(--farbe-akzent) clamp(0.55, l, 0.8) max(c, 0.13) calc(h + 75)); }
+  }
+
+  /* „Weniger Bewegung“ heißt auch: weniger Unruhe. Die Collage steht still,
+     flimmert aber – das zurückzunehmen kostet nichts. */
+  @media (prefers-reduced-motion: reduce) {
+    .stickermuster {
+      opacity: 0.2;
+    }
+  }
+</style>

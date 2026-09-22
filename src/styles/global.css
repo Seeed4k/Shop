@@ -264,8 +264,58 @@ html[data-hintergrund='muster'] body {
   background-size: 1.125rem 1.125rem;
 }
 
+/* Die Sticker-Collage liegt als eigene Ebene hinter der Seite (siehe
+   Stickermuster.astro). Damit sie sichtbar bleibt, darf der Seitenkörper
+   keine eigene Fläche darüberlegen – die Grundfarbe bekommt deshalb das
+   <html>-Element. */
+html[data-hintergrund='sticker'] {
+  background-color: color-mix(in oklab, var(--farbe-primaer) 4%, #ffffff);
+}
+
+html[data-hintergrund='sticker'] body {
+  background-color: transparent;
+}
+
+/* Fließtext direkt auf einer Collage ist kaum zu lesen. Textblöcke bekommen
+   deshalb eine durchscheinende helle Fläche: Die Aufkleber bleiben ringsum
+   und in den Lücken sichtbar, der Text steht aber ruhig.
+   Karten, Kästen und der Fußbereich sind ohnehin deckend und brauchen nichts. */
+html[data-hintergrund='sticker'] :is(.aufmacher__text, .kopfzeile, .angaben, .rechtstext, .seite) {
+  padding: 1.25rem 1.5rem;
+  background: color-mix(in srgb, #ffffff 84%, transparent);
+  border-radius: var(--radius);
+}
+
+/* Die Hülle bringt ihren eigenen Seitenabstand mit. Ohne diese Rücknahme
+   stünde der Textkasten doppelt eingerückt. */
+html[data-hintergrund='sticker'] :is(.kopfzeile, .rechtstext, .seite) {
+  padding-inline: 1.5rem;
+}
+
+/* Freistehende Abschnittsüberschriften sind groß und fett genug, um auf dem
+   Muster zu bestehen – sie bekommen nur einen leichten Schimmer. */
+html[data-hintergrund='sticker'] .brotkrume a {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  margin-inline-start: -0.55rem;
+  background: color-mix(in srgb, #ffffff 84%, transparent);
+  border-radius: var(--radius);
+}
+
+html[data-hintergrund='sticker'] .abschnitt > h2 {
+  display: inline-block;
+  padding: 0.1rem 0.6rem;
+  margin-inline-start: -0.6rem;
+  background: color-mix(in srgb, #ffffff 80%, transparent);
+  border-radius: var(--radius);
+}
+
 /* Vor einem getönten Hintergrund muss der Fußbereich anders abgesetzt werden,
    sonst verschwindet seine Fläche im Seitenhintergrund. */
 html:is([data-hintergrund='papier'], [data-hintergrund='muster'], [data-hintergrund='verlauf']) .fuss {
   background: color-mix(in oklab, var(--farbe-primaer) 11%, #ffffff);
+}
+
+html[data-hintergrund='sticker'] .fuss {
+  background: color-mix(in oklab, var(--farbe-primaer) 12%, #ffffff);
 }
