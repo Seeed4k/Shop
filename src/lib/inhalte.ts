@@ -151,7 +151,7 @@ async function inhalteAufbereiten() {
   const benutzteBilder = new Set<string>();
   for (const eintrag of roheKategorien) if (eintrag.data.bild) benutzteBilder.add(eintrag.data.bild);
   for (const eintrag of roheProdukte) for (const b of eintrag.data.bilder) benutzteBilder.add(b.bild);
-  for (const pfad of [einstellungen.shop.logo, einstellungen.shop.favicon, einstellungen.shop.startseiteBild]) {
+  for (const pfad of [einstellungen.shop.logo, einstellungen.shop.favicon, einstellungen.shop.startseiteBild, einstellungen.shop.hintergrundBild]) {
     if (pfad) benutzteBilder.add(pfad);
   }
   verwaisteBilderMelden(benutzteBilder);

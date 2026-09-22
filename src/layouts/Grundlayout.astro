@@ -1,11 +1,10 @@
 ---
-import { getImage } from 'astro:assets';
+import { getImage, Image } from 'astro:assets';
 import { einstellungen } from '../lib/einstellungen';
 import { bildFinden } from '../lib/bilder';
 import { schriftAuf } from '../lib/farben';
 import { schriftarten } from '../lib/schriften';
 import Kopfbereich from '../components/Kopfbereich.astro';
-import Stickermuster from '../components/Stickermuster.astro';
 import Fussbereich from '../components/Fussbereich.astro';
 import '../styles/global.css';
 
@@ -36,6 +35,12 @@ const { titel, beschreibung, vorschaubild, vorschaubildAlt, strukturierteDaten, 
 const seitentitel = titelAlleinstehend ? titel : `${titel} – ${einstellungen.shop.name}`;
 
 const favicon = bildFinden(einstellungen.shop.favicon, 'Favicon in den Einstellungen');
+
+// Das eigene Hintergrundbild, falls „Eigenes Bild“ gewählt ist.
+const hintergrundBild =
+  einstellungen.shop.hintergrund === 'bild'
+    ? bildFinden(einstellungen.shop.hintergrundBild, 'Eigenes Hintergrundbild in den Einstellungen')
+    : undefined;
 const faviconUrl = favicon ? (await getImage({ src: favicon, width: 180, height: 180, format: 'png' })).src : undefined;
 
 const primaer = einstellungen.shop.primaerfarbe;
@@ -98,7 +103,22 @@ const kanonisch = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : un
   </head>
 
   <body>
-    {einstellungen.shop.hintergrund === 'sticker' && <Stickermuster />}
+    {hintergrundBild && (
+      <div class="hintergrundbild" aria-hidden="true">
+        {/* Schmückend, deshalb ohne Alternativtext. Mehrere Größen, damit das
+            Handy nicht die Fassung für den großen Bildschirm laden muss.
+            Niedrige Priorität: Produktbilder und Text gehen vor. */}
+        <Image
+          src={hintergrundBild}
+          alt=""
+          widths={[640, 1024, 1600]}
+          sizes="100vw"
+          loading="eager"
+          fetchpriority="low"
+          decoding="async"
+        />
+      </div>
+    )}
     <a class="sprungmarke" href="#inhalt">Zum Inhalt springen</a>
     <Kopfbereich />
     <main id="inhalt" tabindex="-1">

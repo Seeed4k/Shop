@@ -81,8 +81,9 @@ const Ueberschrift = `h${ebene}` as 'h2' | 'h3';
   /* Der Fokusrahmen muss die ganze Karte umfassen, nicht nur den Namen –
      sonst sieht man bei Tastaturbedienung nicht, wo man ist. */
   .karte:has(a:focus-visible) {
-    outline: 3px solid var(--farbe-akzent);
+    outline: 3px solid var(--farbe-fokus);
     outline-offset: 2px;
+    box-shadow: 0 0 0 2px #ffffff;
   }
 
   .karte__bildrahmen {

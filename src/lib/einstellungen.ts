@@ -62,6 +62,7 @@ const einstellungenSchema = z.object({
     hintergrund: z
       .enum(hintergrundIds, { error: 'Diesen Hintergrund gibt es nicht. Bitte im Panel einen aus der Liste wählen.' })
       .default('schlicht'),
+    hintergrundBild: freiwillig(z.string()),
     startseiteUeberschrift: z.string().default(''),
     startseiteText: z.string().default(''),
     startseiteBild: freiwillig(z.string()),
@@ -210,6 +211,16 @@ function einstellungenLaden(): Einstellungen {
         )}:1. Für kleinen Text sind 4,5:1 gefordert. Bitte eine etwas dunklere oder hellere Farbe wählen.`
       );
     }
+  }
+
+  // „Eigenes Bild“ ohne Bild ergäbe einen leeren Hintergrund. Dann lieber
+  // schlicht weiß und ein Hinweis.
+  if (einstellungen.shop.hintergrund === 'bild' && !einstellungen.shop.hintergrundBild) {
+    warnen(
+      'Einstellungen',
+      'Als Hintergrund ist „Eigenes Bild“ gewählt, aber kein Bild hochgeladen. Es wird der weiße Hintergrund verwendet.'
+    );
+    einstellungen.shop.hintergrund = 'schlicht';
   }
 
   if (!einstellungen.shop.website) {

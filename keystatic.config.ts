@@ -292,10 +292,14 @@ export default config({
             }),
             hintergrund: fields.select({
               label: 'Hintergrund',
-              description: 'Der Farbton entsteht aus Ihrer Primärfarbe. „Sticker-Collage“ ist auffällig und passt nicht zu jedem Sortiment.',
+              description: 'Bei „Eigenes Bild“ das Bild im Feld darunter hochladen.',
               options: auswahlAus(hintergruende),
               defaultValue: 'schlicht',
             }),
+            hintergrundBild: shopBild(
+              'Eigenes Hintergrundbild',
+              'Nur nötig bei „Eigenes Bild“. Quer, mindestens 1600 Pixel breit. Bitte nur Bilder, an denen Sie die Rechte haben – fremde Grafiken und Logos können eine Abmahnung nach sich ziehen.'
+            ),
             startseiteUeberschrift: fields.text({
               label: 'Überschrift der Startseite',
               description: 'Der erste Satz, den Besucher lesen. Leer lassen heißt: der Name des Shops.',

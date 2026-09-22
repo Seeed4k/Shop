@@ -146,8 +146,9 @@ const vorschaubild = await vorschaubildErzeugen(startbild, Astro.site);
   }
 
   .kachel:has(a:focus-visible) {
-    outline: 3px solid var(--farbe-akzent);
+    outline: 3px solid var(--farbe-fokus);
     outline-offset: 2px;
+    box-shadow: 0 0 0 2px #ffffff;
   }
 
   .kachel__bild {
