@@ -1,8 +1,0 @@
-{
-  "name": "Brot & Gebäck",
-  "beschreibung": "Jeden Morgen frisch im Holzbackofen gebacken, mit Sauerteig aus eigener Führung.",
-  "bild": "/src/bilder/kategorien/brot/bild.jpg",
-  "bildAlt": "Frisch gebackene Brotlaibe auf einem Holzbrett",
-  "reihenfolge": 1,
-  "sichtbar": true
-}

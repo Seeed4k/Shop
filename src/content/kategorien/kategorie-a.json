@@ -1,0 +1,8 @@
+{
+  "name": "Kategorie A",
+  "beschreibung": "Kurze Beschreibung ",
+  "bild": "/src/bilder/kategorien/kategorie-a/bild.jpeg",
+  "bildAlt": "Bunt ",
+  "reihenfolge": 1,
+  "sichtbar": true
+}
