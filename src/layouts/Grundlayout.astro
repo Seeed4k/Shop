@@ -3,6 +3,7 @@ import { getImage } from 'astro:assets';
 import { einstellungen } from '../lib/einstellungen';
 import { bildFinden } from '../lib/bilder';
 import { schriftAuf } from '../lib/farben';
+import { schriftarten } from '../lib/schriften';
 import Kopfbereich from '../components/Kopfbereich.astro';
 import Fussbereich from '../components/Fussbereich.astro';
 import '../styles/global.css';
@@ -35,12 +36,17 @@ const faviconUrl = favicon ? (await getImage({ src: favicon, width: 180, height:
 const primaer = einstellungen.shop.primaerfarbe;
 const akzent = einstellungen.shop.akzentfarbe;
 
+// Die gewählte Schrift wird vorab geladen, damit der Wechsel von der
+// Systemschrift so früh wie möglich passiert. Bei der Systemschrift ist die
+// Liste leer – dann wird nichts geladen.
+const schriftDateien = schriftarten[einstellungen.shop.schrift].dateien;
+
 // Astro.site ist nur gesetzt, wenn in den Einstellungen eine Adresse steht.
 const kanonisch = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 ---
 
 <!doctype html>
-<html lang="de">
+<html lang="de" data-schrift={einstellungen.shop.schrift} data-hintergrund={einstellungen.shop.hintergrund}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -49,6 +55,12 @@ const kanonisch = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : un
     {kanonisch && <link rel="canonical" href={kanonisch} />}
     {faviconUrl && <link rel="icon" href={faviconUrl} />}
     {faviconUrl && <link rel="apple-touch-icon" href={faviconUrl} />}
+
+    {/* crossorigin ist auch bei Dateien vom eigenen Server Pflicht – ohne das
+        Attribut lädt der Browser die Schrift ein zweites Mal. */}
+    {schriftDateien.map((datei) => (
+      <link rel="preload" href={datei} as="font" type="font/woff2" crossorigin />
+    ))}
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={seitentitel} />

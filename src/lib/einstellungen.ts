@@ -1,6 +1,8 @@
 import * as z from 'zod';
 import roheEinstellungen from '../content/einstellungen.json';
 import { warnen } from './warnungen';
+import { schriftartIds } from './schriften';
+import { hintergrundIds } from './hintergruende';
 
 /**
  * Die Einstellungen sind das Herz der Wiederverwendbarkeit: Name, Logo, Farben,
@@ -52,6 +54,16 @@ const einstellungenSchema = z.object({
     favicon: z.string().optional(),
     primaerfarbe: hexFarbe.default('#7a4b2a'),
     akzentfarbe: hexFarbe.default('#3f7d4f'),
+
+    // Schrift und Hintergrund sind Auswahllisten, keine Freitextfelder.
+    // Ein Laie soll eine Stimmung wählen können, ohne Schriftnamen zu kennen
+    // oder eine Farbe zu treffen, die zur Primärfarbe passt.
+    schrift: z
+      .enum(schriftartIds, { error: 'Diese Schriftart gibt es nicht. Bitte im Panel eine aus der Liste wählen.' })
+      .default('system'),
+    hintergrund: z
+      .enum(hintergrundIds, { error: 'Diesen Hintergrund gibt es nicht. Bitte im Panel einen aus der Liste wählen.' })
+      .default('schlicht'),
     startseiteUeberschrift: z.string().default(''),
     startseiteText: z.string().default(''),
     startseiteBild: z.string().optional(),

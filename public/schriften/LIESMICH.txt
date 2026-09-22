@@ -1,0 +1,17 @@
+Schriftdateien dieser Website
+=============================
+
+Alle Schriften sind unter der SIL Open Font License 1.1 veröffentlicht und liegen
+hier als Datei. Sie werden vom eigenen Server ausgeliefert – es wird keine Schrift
+von Google Fonts oder einem anderen Anbieter nachgeladen.
+
+Es handelt sich jeweils um den Zeichensatz "latin" als Variable Font, der alle
+deutschen Umlaute, das ß und das Eurozeichen enthält.
+
+  inter.woff2           Inter            – SIL OFL 1.1, siehe inter-LICENSE.txt
+  lora.woff2            Lora             – SIL OFL 1.1, siehe lora-LICENSE.txt
+  nunito.woff2          Nunito           – SIL OFL 1.1, siehe nunito-LICENSE.txt
+  source-serif-4.woff2  Source Serif 4   – SIL OFL 1.1, siehe source-serif-4-LICENSE.txt
+
+Welche Schrift verwendet wird, steht in den Einstellungen und ist über das
+Admin-Panel umstellbar. Der Browser lädt immer nur die eine gewählte Datei.

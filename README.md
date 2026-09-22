@@ -15,7 +15,7 @@ Einstellungen – Name, Logo, Farben, Kontaktdaten und Messenger kommen nicht au
 | Wartungsfrei | Statischer Build, keine Datenbank, keine Server-Logik. Inhalte liegen als Dateien im Repository. |
 | Laienfreundlich | Pflege über ein Admin-Panel mit E-Mail-Login, ohne GitHub-Kenntnisse. |
 | Datenschutzfreundlich | Keine Cookies, kein Tracking, keine externen Skripte, Schriftarten oder Einbettungen. Beim Seitenaufruf geht keine Anfrage an Dritte. |
-| Wiederverwendbar | Alles Kundenspezifische steht in `src/content/einstellungen.json`. |
+| Wiederverwendbar | Alles Kundenspezifische steht in `src/content/einstellungen.json` – bis hin zu Schrift und Hintergrund. |
 
 ## Technik
 
@@ -23,7 +23,7 @@ Einstellungen – Name, Logo, Farben, Kontaktdaten und Messenger kommen nicht au
 - **Eigenes CSS**, Farben über CSS-Variablen aus den Einstellungen
 - **Keystatic** als Redaktionssystem (siehe `docs/entscheidungen/001-cms-auswahl.md`)
 - **Netlify** als Standard-Hosting mit automatischem Build bei jeder Änderung
-- **Systemschriften** statt geladener Schriftdateien – keine externe Anfrage, kein Ladeflackern
+- **Selbst gehostete Schriften** unter `public/schriften/`, SIL OFL 1.1 – keine Google-Fonts-Einbindung
 
 ## Befehle
 
@@ -48,11 +48,39 @@ src/
 ├── lib/                     Laden, Prüfen und Aufbereiten der Inhalte
 ├── layouts/ components/     Grundgerüst und wiederkehrende Bausteine
 ├── pages/                   Die Seiten der Website
-└── styles/global.css        Grundgestaltung und CSS-Variablen
+└── styles/global.css        Grundgestaltung, Schriften, Hintergründe, CSS-Variablen
+
+public/
+└── schriften/               Die vier Schriftdateien samt Lizenztexten
 ```
 
 **Der Dateiname ist der Slug.** Keystatic erzeugt ihn aus dem Namen, deshalb gibt es kein
 eigenes `slug`-Feld in den Dateien.
+
+## Aussehen: was der Kunde selbst einstellen kann
+
+Über das Panel, ohne eine Zeile Code:
+
+| Einstellung | Wirkung |
+|-------------|---------|
+| Primär- und Akzentfarbe | Kopfbereich, Links, Preise, Buttons. Die Schriftfarbe darauf wird aus der Helligkeit berechnet, damit sie auch bei einer hellen Farbe lesbar bleibt. Linien und ruhige Flächen nehmen automatisch einen Hauch der Primärfarbe auf. |
+| Schriftart | Fünf Auswahlmöglichkeiten: Systemschrift, Modern (Inter), Klassisch (Lora + Inter), Freundlich (Nunito), Traditionell (Source Serif 4). |
+| Hintergrund | Vier Auswahlmöglichkeiten: Schlicht weiß, Warmes Papier, Sanfter Verlauf, Feines Punktmuster. |
+
+**Warum Auswahllisten und keine Freitextfelder?** Der Kunde wählt eine Stimmung, keine
+Schriftnamen und keine zweite Farbe. Die Hintergründe leiten ihren Ton über `color-mix`
+aus der Primärfarbe ab und passen damit immer zum Shop. Die Schriften kommen als fertige
+Paare aus Überschrift und Fließtext – frei kombinierbare Schriften ergeben schnell etwas
+Unruhiges, und eine Vorlage für Laien soll keine Fallgrube sein.
+
+**Was das kostet:** nichts an Anfragen. Die Hintergründe sind reines CSS. Von den vier
+Schriftdateien (37 bis 50 KB) lädt der Browser immer nur die eine gewählte – eine
+`@font-face`-Regel, auf die keine Schriftfamilie verweist, löst keinen Download aus. Bei
+der Systemschrift wird gar keine Datei geholt.
+
+Wer eine Schrift oder einen Hintergrund ergänzen will, trägt sie an zwei Stellen ein:
+`src/lib/schriften.ts` bzw. `src/lib/hintergruende.ts` (Beschriftung fürs Panel) und
+`src/styles/global.css` (die Gestaltung selbst).
 
 ## Zwei Entwurfsentscheidungen, die man kennen sollte
 
